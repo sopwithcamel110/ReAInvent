@@ -1,24 +1,29 @@
-import logo from './logo.svg';
 import './App.css';
+import React , { useRef, useState } from 'react';
 
 function App() {
+  const linkInputRef = useRef();
+  const [ chatBox, updateChatBox ] = useState();
+  async function handleAnalyzeClick() {
+    let linkInput = linkInputRef.current.value;
+    
+    chat(linkInput);
+  }
+  async function chat(url) {
+    // link: video url
+    // PROCESS LINK HERE
+    updateChatBox(url);
+  }
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <>
+    <h3>Enter a video link below:</h3>
+    <input type="text" ref={linkInputRef}/>
+    <input type="button" onClick={handleAnalyzeClick} value="Analyze"/>
+    <hr/>
+    <div>
+      {chatBox}
     </div>
+    </>
   );
 }
 
