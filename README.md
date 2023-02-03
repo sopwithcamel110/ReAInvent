@@ -3,7 +3,7 @@
 1. Start by navigating to the project directory
 2. Create the virtual environment
 ```console 
-python3 -m venv /venv
+python3 -m venv ./venv
 ```
 3. Activate the virtual environment
 ```console 
@@ -13,9 +13,15 @@ python3 -m venv /venv
 ```console 
 pip install -r requirements.txt
 ```
-## Start the webserver
+## Start the API
 ```console 
-flask --debug run
+python ./backend/server.py
 ```
 
-Navigate to localhost:5000 to view the webserver.
+## Start the Website
+```console
+cd frontend
+npm start
+```
+
+Navigate to localhost:3000 to view the webserver.
