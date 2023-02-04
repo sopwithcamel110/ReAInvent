@@ -10,6 +10,7 @@ import openai
 import pickle
 import tiktoken
 import os
+import pywhisper 
 
 # Create Flask App
 app = Flask(__name__)
@@ -48,7 +49,7 @@ class LoadModel(Resource):
     def get(self):
         global model
         if (model == None):
-            model = whisper.load_model("base")
+            model = pywhisper.load_model("base")
         return jsonify({'Completed' : 1})
 
 class GenerateTranscript(Resource):
@@ -59,11 +60,11 @@ class GenerateTranscript(Resource):
         vid = YouTube(youtube_video_url)
         streams = vid.streams.filter(only_audio=True)
 
-        os.mkdir("./content/")
-
+        # print("DEBUG:   " + str(os.path.exists(".\\content\\video.mp3")))
         stream = streams.first()
-        stream.download(filename='./content/video.mp4')
-        output = model.transcribe("./content/video.mp4")
+        
+        audio_file = stream.download(filename="video.mp4")
+        output = model.transcribe(audio_file)
 
 
         with open('output.csv', 'w', newline='') as file:
@@ -73,7 +74,7 @@ class GenerateTranscript(Resource):
             for i in range(len(output['segments'])):
                 writer.writerow(["video", str(i+1), output['segments'][i]['text'], len(output['segments'][i]['tokens'])])
 
-        df = pd.read_csv('./content/output.csv')
+        df = pd.read_csv('.\\content\\output.csv')
         df = df.set_index(["title", "heading"])
 
         # need to make this an environment variable
