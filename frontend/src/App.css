@@ -1,7 +1,7 @@
 body {
     margin-top: 150px;
     text-align: center;
-    background-color: #282828;
+    background-color: #494949;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 16px;
     letter-spacing: 0px;
@@ -39,17 +39,24 @@ body {
 }
 
 .chatbox {
-    background-color:#494949;
+    background-color:#282828;
     height: 500px;
-    width: 1000px;
-    margin: auto;
+    width: 100%;
+    position: absolute;
+    margin: 0;
+    left: 0;
+    padding: 0;
 }
 
 #questionTextInput {
+    background-color: #353535;
+    color: #ffffff;
     height: 40px;
-    width: 500px;
-    border-radius: 25px;
-    text-align: center;
+    width: 50%;
     font-size: larger;
     font-family:Arial, Helvetica, sans-serif;
+    position: absolute;
+    bottom: 50px;
+    left:25%;
+    border:0;
 }

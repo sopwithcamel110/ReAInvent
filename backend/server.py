@@ -26,6 +26,11 @@ document_embeddings =  None
 url = None
 
 # Create resources
+class AnswerQuestion(Resource):
+    def post(self):
+        content = request.json
+        question = content['question']
+        return jsonify({"answer":"Let's find an answer to: " + question})
 class ValidateURL(Resource):
     def get(self, desc=""):
         # Set valid to 1 if url is valid
@@ -80,7 +85,7 @@ class GenerateTranscript(Resource):
 
         #remove file 
         os.remove('./content/video.mp4')"""
-        
+
         return jsonify({'Completed' : 1})
 
 
@@ -88,6 +93,7 @@ class GenerateTranscript(Resource):
 api.add_resource(ValidateURL, "/validate/<desc>")
 api.add_resource(LoadModel, "/loadmodel")
 api.add_resource(GenerateTranscript, "/gentranscript")
+api.add_resource(AnswerQuestion, "/ask")
 
 # Driver
 if __name__ == '__main__':
