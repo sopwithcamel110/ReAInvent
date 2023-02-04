@@ -1,22 +1,10 @@
 import React, { useRef, useState, useEffect } from "react";
+import ReactPlayer from 'react-player'
 import "./App.css";
 
 function App() {
-  /*
-  const [data, setdata] = useState({
-      received: 0
-    });
-    useEffect(() => {
-      fetch("/analyze/"+desc).then((res) =>
-        res.json().then((data) => {
-          setdata({
-            received: data.Received
-          });
-        })
-      );
-    }, []);
-   */
   const textRef = useRef();
+  const [url, setUrl] = useState();
 
   function HandleAnalyzeClicked(e) {
     // Get input
@@ -32,21 +20,26 @@ function App() {
     .then((data) => {
       console.log(data.Valid)
     });
+    setUrl("https://www.youtube.com/watch?v=" + desc)
   }
 
 	return (
 		<div className="App">
 			<header className="App-header">
-				<h1>Youtube Chatbot</h1>
+				<h1>testing</h1>
 			</header>
       <h3>
-        Enter a Youtube link:
+        Enter text:
       </h3>
         <input id="urlInput" name="linkInput" type="text" ref={textRef}/>
         <br/>
         <input type="submit" id="analyzeBtn" value="Analyze" onClick={HandleAnalyzeClicked}/>
         <br/>
-        <label>Video not found.</label>
+        <label>not found.</label>
+        <ReactPlayer url={url} />
+        <div className="Chatbox">
+          
+        </div>
 		</div>
 	);
 }

@@ -8,9 +8,10 @@ app = Flask(__name__)
 api = Api(app)
 
 # Create resources
-class Validate(Resource):
+class ValidateURL(Resource):
     def get(self, desc=""):
         # Set valid to 1 if url is valid
+        # desc: YouTube url descriptor https://www.youtube.com/watch?v=     ----> cdZZpaB2kDM
         valid = 0
         if len(desc) == 11:
             valid = 1
@@ -23,7 +24,7 @@ class Analyze(Resource):
         return jsonify({'descriptor' : link})
 
 # Add resources to API
-api.add_resource(Validate, "/validate/<desc>")
+api.add_resource(ValidateURL, "/validate/<desc>")
 api.add_resource(Analyze, "/analyze/<link>")
 
 # Driver
