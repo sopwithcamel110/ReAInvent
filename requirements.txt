@@ -9,3 +9,8 @@ MarkupSafe==2.1.2
 pytz==2022.7.1
 six==1.16.0
 Werkzeug==2.2.2
+openai
+Transformers
+pytube
+git+https://github.com/openai/whisper.git
+tiktoken
