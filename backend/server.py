@@ -8,19 +8,22 @@ app = Flask(__name__)
 api = Api(app)
 
 # Create resources
-class Hello(Resource):
-    def get(self):
-        return jsonify({'message' : 'hello world'})
-    def post(self):
-        data = request.get_json()
-        return jsonify({'data' : data}), 201
+class Validate(Resource):
+    def get(self, desc=""):
+        # Set valid to 1 if url is valid
+        valid = 0
+        if len(desc) == 11:
+            valid = 1
+        
+        #END CODE
+        return jsonify({'Valid' : valid})
     
 class Analyze(Resource):
     def get(self, link):
         return jsonify({'descriptor' : link})
 
 # Add resources to API
-api.add_resource(Hello, "/")
+api.add_resource(Validate, "/validate/<desc>")
 api.add_resource(Analyze, "/analyze/<link>")
 
 # Driver
