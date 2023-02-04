@@ -1,0 +1,15 @@
+.Question {
+    background-color: #00ff26;
+    color: white;
+    font-size: larger;
+    text-align: right;
+    margin: 0;
+}
+
+.Answer {
+    background-color: #ffa600;
+    color: white;
+    font-size: larger;
+    text-align: left;
+    margin: 0;
+}

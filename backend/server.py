@@ -32,6 +32,7 @@ class AnswerQuestion(Resource):
         content = request.json
         question = content['question']
         return jsonify({"answer":"Let's find an answer to: " + question})
+        
 class ValidateURL(Resource):
     def get(self, desc=""):
         # Set valid to 1 if url is valid

@@ -1,18 +1,22 @@
 import React, { useRef, useState } from "react";
 import ReactPlayer from 'react-player'
 import "./App.css";
+import QandA from './QandA.js';
 
 function App() {
   const textRef = useRef();
   const questionRef = useRef();
   const [url, setUrl] = useState();
   const [progress, setProgress] = useState();
+  const [qs, setQs] = useState([]);
   let desc = "None";
 
   function handleQuestionEnter(e) {
     if (e.key === 'Enter') {
       // Ask question
       let text = questionRef.current.value;
+      setQs(oldArray => [...oldArray, ["Question", text]])
+
       const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -21,7 +25,7 @@ function App() {
       fetch('/ask', requestOptions)
         .then(response => response.json())
         .then(data => {
-          console.log(data.answer);
+          setQs(oldArray => [...oldArray, ["Answer", data.answer]]);
         });
     }
   }
@@ -73,7 +77,7 @@ function App() {
 	return (
 		<>
 			<header className="App-header">
-				<h1>testing</h1>
+				<h1>Testing</h1>
 			</header>
       <h3>
         Enter text:
@@ -85,6 +89,15 @@ function App() {
       <h3>{progress}</h3>
       <ReactPlayer url={url} id="videoplayer"/>
       <div className="chatbox">
+        <div className="QandA">
+          {
+            qs.map((value) => {
+              return (
+                <QandA type={value[0]} text={value[1]}/>
+              )
+            })
+          }
+        </div>
         <div className="questionInput">
           <input id="questionTextInput" type="text" ref={questionRef} onKeyDown={handleQuestionEnter}/>
         </div>
