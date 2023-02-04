@@ -53,21 +53,18 @@ class LoadModel(Resource):
 
 class GenerateTranscript(Resource):
     def get(self):
-        """
         global df
         global document_embeddings
-        if url == None:
-            print("Error: URL undefined")
-            return
-        else:
-            youtube_video_url = url
+        youtube_video_url = url
         vid = YouTube(youtube_video_url)
         streams = vid.streams.filter(only_audio=True)
 
+        os.mkdir("./content/")
+
         stream = streams.first()
         stream.download(filename='./content/video.mp4')
-
         output = model.transcribe("./content/video.mp4")
+
 
         with open('output.csv', 'w', newline='') as file:
             writer = csv.writer(file)
@@ -82,9 +79,6 @@ class GenerateTranscript(Resource):
         # need to make this an environment variable
         openai.api_key = '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'
         document_embeddings = compute_doc_embeddings(df)
-
-        #remove file 
-        os.remove('./content/video.mp4')"""
 
         return jsonify({'Completed' : 1})
 
