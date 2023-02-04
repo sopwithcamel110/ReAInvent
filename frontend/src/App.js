@@ -2,20 +2,23 @@ import React, { useRef, useState } from "react";
 import ReactPlayer from 'react-player'
 import "./App.css";
 import QandA from './QandA.js';
+import { IconContext } from "react-icons";
+import { FiSend } from 'react-icons/fi';
 
 function App() {
   const textRef = useRef();
   const questionRef = useRef();
   const [url, setUrl] = useState();
   const [progress, setProgress] = useState();
-  const [qs, setQs] = useState([]);
+  const [chat, setChat] = useState([]);
   let desc = "None";
 
   function handleQuestionEnter(e) {
     if (e.key === 'Enter') {
       // Ask question
       let text = questionRef.current.value;
-      setQs(oldArray => [...oldArray, ["Question", text]])
+      questionRef.current.value = "";
+      setChat(oldArray => [...oldArray, ["Question", text]]);
 
       const requestOptions = {
         method: 'POST',
@@ -25,21 +28,9 @@ function App() {
       fetch('/ask', requestOptions)
         .then(response => response.json())
         .then(data => {
-          setQs(oldArray => [...oldArray, ["Answer", data.answer]]);
+          setChat(oldArray => [...oldArray, ["Answer", data.answer]]);
         });
     }
-  }
-
-  function LoadModel() {
-    setProgress("Loading Model...");
-    fetch("/loadmodel")
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.Completed === 1) {
-        console.log("Model loaded.");
-        GenerateTranscript();
-      }
-    });
   }
 
   function GenerateTranscript() {
@@ -50,9 +41,10 @@ function App() {
       if (data.Completed === 1) {
         console.log("Transcript loaded.");
         setUrl("https://www.youtube.com/watch?v=" + desc)
+        questionRef.current.scrollIntoView();
+        setProgress("");
       }
     });
-    setProgress("");
   }
 
   function HandleAnalyzeClicked(e) {
@@ -69,7 +61,8 @@ function App() {
     .then((response) => response.json())
     .then((data) => {
       if (data.Valid === 1) {
-        LoadModel();
+        // Cleanup
+        GenerateTranscript();
       }
     });
   }
@@ -91,7 +84,7 @@ function App() {
       <div className="chatbox">
         <div className="QandA">
           {
-            qs.map((value) => {
+            chat.map((value) => {
               return (
                 <QandA type={value[0]} text={value[1]}/>
               )
@@ -100,6 +93,9 @@ function App() {
         </div>
         <div className="questionInput">
           <input id="questionTextInput" type="text" ref={questionRef} onKeyDown={handleQuestionEnter}/>
+          <IconContext.Provider value={{ size: "20px", top: "10px" }}>
+            <FiSend />
+          </IconContext.Provider>
         </div>
       </div>
 		</>
