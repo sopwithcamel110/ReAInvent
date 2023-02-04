@@ -4,23 +4,53 @@ import "./App.css";
 
 function App() {
   const textRef = useRef();
+  const questionRef = useRef();
   const [url, setUrl] = useState();
+  const [progress, setProgress] = useState();
+  let desc = "None";
+
+  function LoadModel() {
+    setProgress("Loading Model...");
+    fetch("/loadmodel")
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.Completed == 1) {
+        console.log("Model loaded.");
+        GenerateTranscript();
+      }
+    });
+  }
+
+  function GenerateTranscript() {
+    setProgress("Fetching Transcript...");
+    fetch("/gentranscript")
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.Completed == 1) {
+        console.log("Transcript loaded.");
+        setUrl("https://www.youtube.com/watch?v=" + desc)
+      }
+    });
+    setProgress("");
+  }
 
   function HandleAnalyzeClicked(e) {
+    setProgress("Validating URL...");
     // Get input
     let text = textRef.current.value;
     if (text === "") {
       text = "None"
     }
     // Isolate descriptor from youtube link
-    let desc = (text.replace("https://", "")).replace("www.youtube.com/watch?v=", "");
+    desc = (text.replace("https://", "")).replace("www.youtube.com/watch?v=", "");
     // Create get request
     fetch("/validate/"+desc)
     .then((response) => response.json())
     .then((data) => {
-      console.log(data.Valid)
+      if (data.Valid == 1) {
+        LoadModel();
+      }
     });
-    setUrl("https://www.youtube.com/watch?v=" + desc)
   }
 
 	return (
@@ -35,10 +65,12 @@ function App() {
         <br/>
         <input type="submit" id="analyzeBtn" value="Analyze" onClick={HandleAnalyzeClicked}/>
         <br/>
-        <label>not found.</label>
-        <ReactPlayer url={url} />
-        <div className="Chatbox">
-          
+        <h3>{progress}</h3>
+        <ReactPlayer url={url} id="videoplayer"/>
+        <div className="chatbox">
+          <div className="questionInput">
+            <input id="questionTextInput" type="text" ref={questionRef}/>
+          </div>
         </div>
 		</div>
 	);

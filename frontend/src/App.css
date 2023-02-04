@@ -33,3 +33,23 @@ body {
     color: #E4E4E4;
     background-color: #060606;
 }
+
+#videoplayer {
+    margin: auto;
+}
+
+.chatbox {
+    background-color:#494949;
+    height: 500px;
+    width: 1000px;
+    margin: auto;
+}
+
+#questionTextInput {
+    height: 40px;
+    width: 500px;
+    border-radius: 25px;
+    text-align: center;
+    font-size: larger;
+    font-family:Arial, Helvetica, sans-serif;
+}
