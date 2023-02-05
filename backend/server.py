@@ -46,7 +46,7 @@ COMPLETIONS_API_PARAMS = {
 class LoadModel(Resource):
     def get(self):
         global model
-        model = whisper.load_model("base")
+        model = whisper.load_model("small")
 
         return jsonify({'Completed' : 1})
 
@@ -160,9 +160,9 @@ class GenerateTranscript(Resource):
             os.mkdir("./content/")
 
         stream = streams.first()
-        out_file=stream.download(filename='./content/video.mp3')
+        out_file=stream.download(filename='./content/video.mp4')
 
-        output = model.transcribe('./content/video.mp3')
+        output = model.transcribe('./content/video.mp4')
         output_transcript = output
 
         # model = replicate.models.get("openai/whisper")
