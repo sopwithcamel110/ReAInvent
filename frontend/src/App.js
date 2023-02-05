@@ -23,8 +23,8 @@ function App() {
     // Ask question
     let text = questionRef.current.value;
     questionRef.current.value = "";
-    setChat(oldArray => [["Question", text], ["Answer", "Here is the answer"], ...oldArray]);
-    /*const requestOptions = {
+    setChat(oldArray => [["Question", text], ...oldArray]);
+    const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ question: text })
@@ -32,8 +32,8 @@ function App() {
     fetch('/ask', requestOptions)
       .then(response => response.json())
       .then(data => {
-        setChat(oldArray => [...oldArray, ["Answer", data.answer]]);
-      });*/
+        setChat(oldArray => [["Answer", data.answer], ...oldArray]);
+      });
   }
 
   function LoadModel() {
@@ -55,7 +55,8 @@ function App() {
       if (data.Completed === 1) {
         console.log("Transcript loaded.");
         setUrl("https://www.youtube.com/watch?v=" + desc)
-        questionRef.current.scrollIntoView();
+        window.scrollTo(0, 200);
+        //questionRef.current.scrollIntoView({behavior: "smooth"});
         setProgress("");
       }
     });
@@ -104,7 +105,8 @@ function App() {
       <input type="submit" id="analyzeBtn" value="Analyze" onClick={HandleAnalyzeClicked}/>
       <br/>
       <h3>{progress}</h3>
-      <ReactPlayer url={url} id="videoplayer"/>
+      <ReactPlayer url={url} id="videoplayer" style= {{
+      }}/>
       <div className="chatbox">
         <div className="questionInput">
           <input id="questionTextInput" type="text" ref={questionRef} onKeyDown={handleQuestionEnter}/>

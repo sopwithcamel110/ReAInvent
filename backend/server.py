@@ -14,6 +14,8 @@ import os
 from pathlib import Path
 import replicate
 import requests
+from youtube_transcript_api import YouTubeTranscriptApi
+from pytube import extract 
 
 # Create Flask App
 app = Flask(__name__)
@@ -46,7 +48,7 @@ COMPLETIONS_API_PARAMS = {
 class LoadModel(Resource):
     def get(self):
         global model
-        model = whisper.load_model("small")
+        # model = whisper.load_model("small")
 
         return jsonify({'Completed' : 1})
 
@@ -71,31 +73,32 @@ def answer_query_with_context(query,df,document_embeddings,show_prompt):
     return response["choices"][0]["text"].strip(" \n")
 
 def construct_prompt(question, context_embeddings, df):
-    global arrayInds
     most_relevant_document_sections = order_document_sections_by_query_similarity(question, context_embeddings)
     
     chosen_sections = []
     chosen_sections_len = 0
     chosen_sections_indexes = []
-     
+
+    count = 30
+    
     for _, section_index in most_relevant_document_sections:
         # Add contexts until we run out of space.        
         document_section = df.loc[section_index]
         
         chosen_sections_len += document_section.tokens + separator_len
-        if chosen_sections_len > MAX_SECTION_LEN:
+        if count == 0:
             break
+        else:
+            count -= 1 
             
         chosen_sections.append(SEPARATOR + document_section.content.replace("\n", " "))
         chosen_sections_indexes.append(str(section_index))
             
-    # Useful diagnostic information
+    # # Useful diagnostic information
     # print(f"Selected {len(chosen_sections)} document sections:")
     # print("\n".join(chosen_sections_indexes))
     
-    arrInds = chosen_sections_indexes
-
-    header = """Answer the question as truthfully as possible using the provided context from a video, and if the answer is not contained within the text below, say "I don't know."\n\nContext:\n"""
+    header = """Answer the question as truthfully as possible using the provided context from a youtube video, and if the answer is not contained within the text below, say "I don't know."\n\nContext:\n"""
     
     return header + "".join(chosen_sections) + "\n\n Q: " + question + "\n A:"
 
@@ -153,95 +156,45 @@ class GenerateTranscript(Resource):
     def get(self):
         global df
         global document_embeddings
-        global output_transcript
+        youtube_video_url = url
+        vid = YouTube(youtube_video_url)
         streams = vid.streams.filter(only_audio=True)
 
-        if(not os.path.exists("./content")):
-            os.mkdir("./content/")
+        id=extract.video_id(youtube_video_url)
 
-        stream = streams.first()
-        out_file=stream.download(filename='./content/video.mp4')
+        output = YouTubeTranscriptApi.get_transcript(id, languages=['en'])
 
-        output = model.transcribe('./content/video.mp4')
-        output_transcript = output
+        fin_out = []
+        count = 0 
+        for seg in output: 
+            if(count >= len(output) - 8):
+                break
+            else:
+                string = output[count]['text'] + " " + output[count+1]['text']+ " " + output[count+2]['text'] + " " + output[count+3]['text'] + output[count+4]['text'] + output[count+5]['text'] + output[count+6]['text'] + output[count+7]['text']
+                start = output[count]['start']
+                fin_out.append({'text': string, 'start':start, 'end':-1})
+                count += 8
 
-        # model = replicate.models.get("openai/whisper")
-        # version = model.versions.get("23241e5731b44fcb5de68da8ebddae1ad97c5094d24f94ccb11f7c1d33d661e2")
+        output = fin_out
 
-        # inputs = {
-        #     # Audio file
-        #     'audio': open("./content/video.mp3", "rb"),
-
-        #     # Choose a Whisper model.
-        #     'model': "tiny",
-
-        #     # Choose the format for the transcription
-        #     'transcription': "plain text",
-
-        #     # Translate the text to English when set to True
-        #     'translate': False,
-
-        #     # language spoken in the audio, specify None to perform language
-        #     # detection
-        #     # 'language': ...,
-
-        #     # temperature to use for sampling
-        #     'temperature': 0,
-
-        #     # optional patience value to use in beam decoding, as in
-        #     # https://arxiv.org/abs/2204.05424, the default (1.0) is equivalent to
-        #     # conventional beam search
-        #     # 'patience': ...,
-
-        #     # comma-separated list of token ids to suppress during sampling; '-1'
-        #     # will suppress most special characters except common punctuations
-        #     'suppress_tokens': "-1",
-
-        #     # optional text to provide as a prompt for the first window.
-        #     # 'initial_prompt': ...,
-
-        #     # if True, provide the previous output of the model as a prompt for
-        #     # the next window; disabling may make the text inconsistent across
-        #     # windows, but the model becomes less prone to getting stuck in a
-        #     # failure loop
-        #     'condition_on_previous_text': True,
-
-        #     # temperature to increase when falling back when the decoding fails to
-        #     # meet either of the thresholds below
-        #     'temperature_increment_on_fallback': 0.2,
-
-        #     # if the gzip compression ratio is higher than this value, treat the
-        #     # decoding as failed
-        #     'compression_ratio_threshold': 2.4,
-
-        #     # if the average log probability is lower than this value, treat the
-        #     # decoding as failed
-        #     'logprob_threshold': -1,
-
-        #     # if the probability of the <|nospeech|> token is higher than this
-        #     # value AND the decoding has failed due to `logprob_threshold`,
-        #     # consider the segment as silence
-        #     'no_speech_threshold': 0.6,
-        # }
-
-        # #   output = model.transcribe(Path("content//Indus Valley Civilization   Early Civilizations  World History  Khan Academy.mp3"))\
-        # output = version.predict(**inputs)
-        # output_transcript = output
 
         with open('./content/output.csv', 'w', newline='') as file:
             writer = csv.writer(file)
             writer.writerow(["title", "heading", "content", "tokens"])
             content = []
-            for i in range(len(output['segments'])):
-                writer.writerow(["video", str(i+1), output['segments'][i]['text'], len(output['segments'][i]['tokens'])])
-
+            count = 0 
+            for seg in output: 
+                count += 1
+                writer.writerow(["video", str(count), seg['text']])
+            
+        # for i in range(len(srt['segments'])):
+        #     writer.writerow(["video", str(i+1), output['segments'][i]['text'], len(output['segments'][i]['tokens'])])
         df = pd.read_csv('./content/output.csv')
         df = df.set_index(["title", "heading"])
 
-            # need to make this an environment variable
+        # need to make this an environment variable
         openai.api_key = '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'
         document_embeddings = compute_doc_embeddings(df)
-
         return jsonify({'Completed' : 1})
 
 class AnswerQuestion(Resource):

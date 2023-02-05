@@ -7,18 +7,20 @@
 }
 
 .textAreaQuestion {
+    padding: 20px;
+    background-color: #282828;
     color: white;
     font-size: larger;
     text-align: right;
-    height: 50px;
     top: 25%;
 }
 
 .textAreaAnswer {
+    padding: 20px;
+    background-color: #515151;
     color: white;
     font-size: larger;
     text-align: left;
-    height: 50px;
     top: 25%;
     box-shadow: 5px 5px 10px 2px rgba(0,0,0,.1); 
 }
