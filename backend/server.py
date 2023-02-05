@@ -34,6 +34,7 @@ url = None
 output_transcript = None
 document_embeddings =  None
 vid_length = None
+vid = None
 COMPLETIONS_API_PARAMS = {
     # We use temperature of 0.0 because it gives the most predictable, factual answer.
     "temperature": 0.0,
@@ -46,11 +47,14 @@ class ValidateURL(Resource):
     def get(self, desc=""):
         # Set valid to 1 if url is valid
         # desc: YouTube url descriptor https://www.youtube.com/watch?v=     ----> cdZZpaB2kDM
-        valid = 0
-        if len(desc) == 11:
+        global url
+        global vid
+        url = "https://www.youtube.com/watch?v=" + desc
+        try:
+            vid = YouTube(url)
             valid = 1
-            global url
-            url = "https://www.youtube.com/watch?v=" + desc
+        except:
+            valid = 0
         
         #END CODE
         return jsonify({'Valid' : valid})
