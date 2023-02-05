@@ -8,11 +8,11 @@ function QandA(args) {
 	return (
 		<div className={args.type}>
             <div className={"textArea" + args.type}>
-                <IconContext.Provider value={{ size: "25px" }}>
-                    {args.type === "Answer" ? <IoMdBarcode/> : <div/>}
-                    {args.text}
-                    {args.type === "Question" ? <GoPerson/> : <div/>}
-                </IconContext.Provider>
+                {args.type === "Answer" ? <img src="/logo512.png" alt="Italian Trulli" style={{
+                    width: "25px", height:"25px"
+                }}/> : <div/>}
+                {args.text}
+                {args.type === "Question" ? <GoPerson/> : <div/>}
             </div>
 		</div>
 	);

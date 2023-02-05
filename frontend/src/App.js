@@ -2,7 +2,6 @@ import React, { useRef, useState } from "react";
 import ReactPlayer from 'react-player'
 import "./App.css";
 import QandA from './QandA.js';
-import { IconContext } from "react-icons";
 import { FiSend } from 'react-icons/fi';
 import {GrYoutube} from 'react-icons/gr';
 
@@ -16,22 +15,25 @@ function App() {
 
   function handleQuestionEnter(e) {
     if (e.key === 'Enter') {
-      // Ask question
-      let text = questionRef.current.value;
-      questionRef.current.value = "";
-      setChat(oldArray => [...oldArray, ["Question", text]]);
-
-      const requestOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: text })
-      };
-      fetch('/ask', requestOptions)
-        .then(response => response.json())
-        .then(data => {
-          setChat(oldArray => [...oldArray, ["Answer", data.answer]]);
-        });
+      askQuestion();
     }
+  }
+  
+  function askQuestion() {
+    // Ask question
+    let text = questionRef.current.value;
+    questionRef.current.value = "";
+    setChat(oldArray => [["Question", text], ["Answer", "Here is the answer"], ...oldArray]);
+    /*const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question: text })
+    };
+    fetch('/ask', requestOptions)
+      .then(response => response.json())
+      .then(data => {
+        setChat(oldArray => [...oldArray, ["Answer", data.answer]]);
+      });*/
   }
 
   function LoadModel() {
@@ -94,7 +96,7 @@ function App() {
       </h3>
       <div className="urlInput">
         <GrYoutube color = "red" size = "30px" style = {{
-          position: "absolute", top: "295px", left: "400px"
+          marginLeft: "-20px", marginBottom: "-7px"
         }}/>
         <input id="urlTextInput" name="linkInput" type="text" ref={textRef}/>
       </div>
@@ -104,6 +106,12 @@ function App() {
       <h3>{progress}</h3>
       <ReactPlayer url={url} id="videoplayer"/>
       <div className="chatbox">
+        <div className="questionInput">
+          <input id="questionTextInput" type="text" ref={questionRef} onKeyDown={handleQuestionEnter}/>
+          <FiSend className="questionButton" onClick={askQuestion} size= "20px" style= {{
+            marginTop: "10px"
+          }}/>
+        </div>
         <div className="QandA">
           {
             chat.map((value) => {
@@ -112,12 +120,6 @@ function App() {
               )
             })
           }
-        </div>
-        <div className="questionInput">
-          <input id="questionTextInput" type="text" ref={questionRef} onKeyDown={handleQuestionEnter}/>
-          <IconContext.Provider value={{ size: "20px", top: "10px" }}>
-            <FiSend />
-          </IconContext.Provider>
         </div>
       </div>
 		</>
