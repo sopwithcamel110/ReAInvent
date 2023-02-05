@@ -30,11 +30,11 @@ ENCODING = "cl100k_base"  # encoding for text-embedding-ada-002
 encoding = tiktoken.get_encoding(ENCODING)
 separator_len = len(encoding.encode(SEPARATOR))
 df = None 
-url = None
 output_transcript = None
 document_embeddings =  None
 vid_length = None
 vid = None
+model = None
 COMPLETIONS_API_PARAMS = {
     # We use temperature of 0.0 because it gives the most predictable, factual answer.
     "temperature": 0.0,
@@ -43,11 +43,17 @@ COMPLETIONS_API_PARAMS = {
 }
 
 # Create resources
+class LoadModel(Resource):
+    def get(self):
+        global model
+        model = whisper.load_model("base")
+
+        return jsonify({'Completed' : 1})
+
 class ValidateURL(Resource):
     def get(self, desc=""):
         # Set valid to 1 if url is valid
         # desc: YouTube url descriptor https://www.youtube.com/watch?v=     ----> cdZZpaB2kDM
-        global url
         global vid
         url = "https://www.youtube.com/watch?v=" + desc
         try:
@@ -162,8 +168,6 @@ class GenerateTranscript(Resource):
     def get(self):
         global df
         global document_embeddings
-        youtube_video_url = url
-        vid = YouTube(youtube_video_url)
         streams = vid.streams.filter(only_audio=True)
 
         if(not os.path.exists("./content")):
@@ -171,6 +175,8 @@ class GenerateTranscript(Resource):
 
         stream = streams.first()
         out_file=stream.download(filename='./content/video.mp3')
+
+
 
         model = replicate.models.get("openai/whisper")
         version = model.versions.get("23241e5731b44fcb5de68da8ebddae1ad97c5094d24f94ccb11f7c1d33d661e2")
@@ -263,10 +269,12 @@ class AnswerQuestion(Resource):
 api.add_resource(ValidateURL, "/validate/<desc>")
 api.add_resource(GenerateTranscript, "/gentranscript")
 api.add_resource(AnswerQuestion, "/ask")
+api.add_resource(LoadModel, "/loadmodel")
 
 # Driver
 if __name__ == '__main__':
     app.run(debug=True)
+
 
 # getting the indices from the string into an array
 def makeNumArr():

@@ -34,6 +34,17 @@ function App() {
     }
   }
 
+  function LoadModel() {
+    setProgress("Loading Model...");
+    fetch("/loadmodel")
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.Completed === 1) {
+        GenerateTranscript();
+      }
+    });
+  }
+
   function GenerateTranscript() {
     setProgress("Fetching Transcript...");
     fetch("/gentranscript")
@@ -63,7 +74,7 @@ function App() {
     .then((data) => {
       if (data.Valid === 1) {
         // Cleanup
-        GenerateTranscript();
+        LoadModel();
       }
       else {
         setProgress("Invalid URL.");
