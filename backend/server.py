@@ -12,6 +12,7 @@ import tiktoken
 import os
 from pathlib import Path
 import replicate
+import requests
 
 # Create Flask App
 app = Flask(__name__)
@@ -35,20 +36,8 @@ COMPLETIONS_API_PARAMS = {
     "max_tokens": 500,
     "model": COMPLETIONS_MODEL,
 }
+vid = None
 
-# Create resources
-class ValidateURL(Resource):
-    def get(self, desc=""):
-        # Set valid to 1 if url is valid
-        # desc: YouTube url descriptor https://www.youtube.com/watch?v=     ----> cdZZpaB2kDM
-        valid = 0
-        if len(desc) == 11:
-            valid = 1
-            global url
-            url = "https://www.youtube.com/watch?v=" + desc
-        
-        #END CODE
-        return jsonify({'Valid' : valid})
 
 #needed methods
 def answer_query_with_context(query,df,document_embeddings,show_prompt):
@@ -126,12 +115,31 @@ def order_document_sections_by_query_similarity(query, contexts):
     return document_similarities
 
 # API
+class ValidateURL(Resource):
+    def get(self, desc=""):
+        # Set valid to 1 if url is valid
+        # desc: YouTube url descriptor https://www.youtube.com/watch?v=     ----> cdZZpaB2kDM
+        global url
+        global vid
+        url = "https://www.youtube.com/watch?v=" + desc
+        try:
+            vid = YouTube(url)
+            valid = 1
+        except:
+            valid = 0
+        
+        #END CODE
+        return jsonify({'Valid' : valid})
+        
+class Ping(Resource):
+    def get(self):
+        return jsonify({'message' : "Pong!"})
+
 class GenerateTranscript(Resource):
     def get(self):
         global df
         global document_embeddings
-        youtube_video_url = url
-        vid = YouTube(youtube_video_url)
+        global vid
         streams = vid.streams.filter(only_audio=True)
 
         if(not os.path.exists("./content")):
@@ -148,7 +156,7 @@ class GenerateTranscript(Resource):
             'audio': open("./content/video.mp3", "rb"),
 
             # Choose a Whisper model.
-            'model': "base",
+            'model': "tiny",
 
             # Choose the format for the transcription
             'transcription': "plain text",

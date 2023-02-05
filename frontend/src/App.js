@@ -4,6 +4,7 @@ import "./App.css";
 import QandA from './QandA.js';
 import { IconContext } from "react-icons";
 import { FiSend } from 'react-icons/fi';
+import {GrYoutube} from 'react-icons/gr';
 
 function App() {
   const textRef = useRef();
@@ -64,6 +65,9 @@ function App() {
         // Cleanup
         GenerateTranscript();
       }
+      else {
+        setProgress("Invalid URL.");
+      }
     });
   }
 
@@ -77,7 +81,12 @@ function App() {
       <h3>
         Enter Youtube URL below:
       </h3>
-      <input id="urlInput" name="linkInput" type="text" ref={textRef}/>
+      <div className="urlInput">
+        <GrYoutube color = "red" size = "30px" style = {{
+          position: "absolute", top: "295px", left: "400px"
+        }}/>
+        <input id="urlTextInput" name="linkInput" type="text" ref={textRef}/>
+      </div>
       <br/>
       <input type="submit" id="analyzeBtn" value="Analyze" onClick={HandleAnalyzeClicked}/>
       <br/>
