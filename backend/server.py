@@ -25,7 +25,7 @@ api = Api(app)
 # Global vars
 COMPLETIONS_MODEL = "text-davinci-003"
 EMBEDDING_MODEL = "text-embedding-ada-002"
-os.environ["REPLICATE_API_TOKEN"] = 'cc7adc079220b946329055014b9e32299e37bca9'
+OPENAI_APIKEY = "XXX-XXX-XXX"
 MAX_SECTION_LEN = 500
 SEPARATOR = "\n* "
 ENCODING = "cl100k_base"  # encoding for text-embedding-ada-002
@@ -213,6 +213,7 @@ class GenerateTranscript(Resource):
         global document_embeddings
         global vid_length
         global output_transcript
+        global OPENAI_APIKEY
         if (not os.path.exists("./content")):
             os.mkdir("./content")
         youtube_video_url = url
@@ -249,7 +250,7 @@ class GenerateTranscript(Resource):
         df = df.set_index(["title", "heading"])
 
         # need to make this an environment variable
-        openai.api_key = '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'
+        openai.api_key = OPENAI_APIKEY
         document_embeddings = compute_doc_embeddings(df)
         return jsonify({'Completed' : 1})
 
