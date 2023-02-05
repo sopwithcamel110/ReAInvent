@@ -92,7 +92,7 @@ def construct_prompt(question, context_embeddings, df):
     # print(f"Selected {len(chosen_sections)} document sections:")
     # print("\n".join(chosen_sections_indexes))
     
-    header = """Answer the question as truthfully as possible using the provided context, and if the answer is not contained within the text below, say "I don't know."\n\nContext:\n"""
+    header = """Answer the question as truthfully as possible using the provided context from a video, and if the answer is not contained within the text below, say "I don't know."\n\nContext:\n"""
     
     return header + "".join(chosen_sections) + "\n\n Q: " + question + "\n A:"
 

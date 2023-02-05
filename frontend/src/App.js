@@ -70,10 +70,12 @@ function App() {
 	return (
 		<>
 			<header className="App-header">
-				<h1>Testing</h1>
+				<h1>Re</h1>
+        <h1 className="titleAI">AI</h1>
+        <h1>nvent</h1>
 			</header>
       <h3>
-        Enter text:
+        Enter Youtube URL below:
       </h3>
       <input id="urlInput" name="linkInput" type="text" ref={textRef}/>
       <br/>
