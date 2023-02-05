@@ -8,6 +8,7 @@ import {GrYoutube} from 'react-icons/gr';
 function App() {
   const textRef = useRef();
   const questionRef = useRef();
+  const playerRef = useRef();
   const [url, setUrl] = useState();
   const [progress, setProgress] = useState();
   const [chat, setChat] = useState([]);
@@ -23,7 +24,7 @@ function App() {
     // Ask question
     let text = questionRef.current.value;
     questionRef.current.value = "";
-    setChat(oldArray => [["Question", text], ...oldArray]);
+    setChat(oldArray => [["Question", text, []], ...oldArray]);
     const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -32,7 +33,8 @@ function App() {
     fetch('/ask', requestOptions)
       .then(response => response.json())
       .then(data => {
-        setChat(oldArray => [["Answer", data.answer], ...oldArray]);
+        console.log(data.stamps);
+        setChat(oldArray => [["Answer", data.answer, data.stamps], ...oldArray]);
       });
   }
 
@@ -55,8 +57,7 @@ function App() {
       if (data.Completed === 1) {
         console.log("Transcript loaded.");
         setUrl("https://www.youtube.com/watch?v=" + desc)
-        window.scrollTo(0, 200);
-        //questionRef.current.scrollIntoView({behavior: "smooth"});
+        questionRef.current.scrollIntoView({behavior: "smooth"});
         setProgress("");
       }
     });
@@ -105,7 +106,7 @@ function App() {
       <input type="submit" id="analyzeBtn" value="Analyze" onClick={HandleAnalyzeClicked}/>
       <br/>
       <h3>{progress}</h3>
-      <ReactPlayer url={url} id="videoplayer" style= {{
+      <ReactPlayer ref={playerRef} controls="true" url={url} id="videoplayer" style= {{
       }}/>
       <div className="chatbox">
         <div className="questionInput">
@@ -118,7 +119,7 @@ function App() {
           {
             chat.map((value) => {
               return (
-                <QandA type={value[0]} text={value[1]}/>
+                <QandA playerRef={playerRef} type={value[0]} text={value[1]} stamps={value[2]}/>
               )
             })
           }

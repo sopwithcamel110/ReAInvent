@@ -32,6 +32,7 @@ ENCODING = "cl100k_base"  # encoding for text-embedding-ada-002
 encoding = tiktoken.get_encoding(ENCODING)
 separator_len = len(encoding.encode(SEPARATOR))
 df = None 
+arrInds = None 
 output_transcript = None
 document_embeddings =  None
 vid_length = None
@@ -43,14 +44,59 @@ COMPLETIONS_API_PARAMS = {
     "max_tokens": 500,
     "model": COMPLETIONS_MODEL,
 }
+def makeNumArr():
+    num = arrInds
+    arr = []
+    for i in range(len(num)):
+        arr.append(int(num[i][10:len(num[i])-1]))
+    return arr 
 
-# Create resources
-class LoadModel(Resource):
-    def get(self):
-        global model
-        # model = whisper.load_model("small")
+def get_start_and_end():
+    arrNum = makeNumArr()
+    output = output_transcript
 
-        return jsonify({'Completed' : 1})
+    arrPut = output
+
+    arrTime = []
+    for i in range(len(arrNum)):
+        text = df['content'][arrNum[i]-1]
+        text = text.strip()
+        text = text.lower()
+        for j in range(len(arrPut)):
+            temp = arrPut[j]['text']
+            temp = temp.strip()
+            temp = temp.lower()
+            if temp == text: 
+                arrTime.append( ( int(arrPut[j]['start']) , int(arrPut[j]['end'] )) )
+
+    return arrTime
+
+def getLinks():
+    arrTimes = get_start_and_end()
+    sorted(arrTimes)
+    arrLink = [] 
+
+    for i in range(len(arrTimes)):
+        arrLink.append(str(arrTimes[i][0]-3))
+    
+    return arrLink
+
+def filterLinks():
+    count = 0
+    ratio = 0.116
+    capped = min(int(ratio*vid_length/60), 10)
+
+    links = getLinks()
+    # print("links: ")
+    # print(links)
+    fin_links = []
+
+    while(count <= capped):
+        fin_links.append(links[count])
+        count += 1 
+    
+    return fin_links
+
 
 #needed methods
 def answer_query_with_context(query,df,document_embeddings,show_prompt):
@@ -73,6 +119,7 @@ def answer_query_with_context(query,df,document_embeddings,show_prompt):
     return response["choices"][0]["text"].strip(" \n")
 
 def construct_prompt(question, context_embeddings, df):
+    global arrInds
     most_relevant_document_sections = order_document_sections_by_query_similarity(question, context_embeddings)
     
     chosen_sections = []
@@ -93,7 +140,8 @@ def construct_prompt(question, context_embeddings, df):
             
         chosen_sections.append(SEPARATOR + document_section.content.replace("\n", " "))
         chosen_sections_indexes.append(str(section_index))
-            
+    
+    arrInds = chosen_sections_indexes
     # # Useful diagnostic information
     # print(f"Selected {len(chosen_sections)} document sections:")
     # print("\n".join(chosen_sections_indexes))
@@ -132,6 +180,13 @@ def order_document_sections_by_query_similarity(query, contexts):
     return document_similarities
 
 # API
+# Create resources
+class LoadModel(Resource):
+    def get(self):
+        global model
+        # model = whisper.load_model("small")
+
+        return jsonify({'Completed' : 1})
 class ValidateURL(Resource):
     def get(self, desc=""):
         # Set valid to 1 if url is valid
@@ -156,14 +211,16 @@ class GenerateTranscript(Resource):
     def get(self):
         global df
         global document_embeddings
+        global vid_length
+        global output_transcript
+        if (not os.path.exists("./content")):
+            os.mkdir("./content")
         youtube_video_url = url
         vid = YouTube(youtube_video_url)
         streams = vid.streams.filter(only_audio=True)
-
         id=extract.video_id(youtube_video_url)
-
+        vid_length = vid.length
         output = YouTubeTranscriptApi.get_transcript(id, languages=['en'])
-
         fin_out = []
         count = 0 
         for seg in output: 
@@ -176,8 +233,7 @@ class GenerateTranscript(Resource):
                 count += 8
 
         output = fin_out
-
-
+        output_transcript = output
         with open('./content/output.csv', 'w', newline='') as file:
             writer = csv.writer(file)
             writer.writerow(["title", "heading", "content", "tokens"])
@@ -202,7 +258,8 @@ class AnswerQuestion(Resource):
         content = request.json
         question = content['question']
         answer =  answer_query_with_context(question, df, document_embeddings, False)
-        return jsonify({"answer": answer})
+        stamps = filterLinks()
+        return jsonify({"answer": answer, "stamps" : stamps})
 
 
 # Add resources to API
@@ -228,7 +285,7 @@ def get_start_and_end():
     arrNum = makeNumArr()
     output = output_transcript
 
-    arrPut = output['segments']
+    arrPut = output
 
     arrTime = []
     for i in range(len(arrNum)):
@@ -241,28 +298,5 @@ def get_start_and_end():
             temp = temp.lower()
             if temp == text: 
                 arrTime.append( ( int(arrPut[j]['start']) , int(arrPut[j]['end'] )) )
+    return arrTime
 
-        return arrTime
-
-def getLinks():
-    arrTimes = get_start_and_end()
-    sorted(arrTimes)
-    arrLink = [] 
-
-    for i in range(len(arrTimes)):
-        arrLink.append(url+'&t='+str(arrTimes[i][0]-3)+'s')
-    
-    return arrLink
-
-def filterLinks():
-    ratio = 0.3
-    capped = min(ratio*vid_length, 10)
-
-    links = getLinks()
-    fin_links = []
-
-    while(count <= capped):
-        fin_links.append(links[count])
-        count += 1 
-    
-    return fin_links

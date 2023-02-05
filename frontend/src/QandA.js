@@ -3,6 +3,9 @@ import "./QandA.css";
 import { GoPerson } from 'react-icons/go';
 
 function QandA(args) {
+    function seek(e) {
+        args.playerRef.current.seekTo(e.target.id);
+    }
 	return (
 		<div className={args.type}>
             <p className={"textArea" + args.type}>
@@ -14,6 +17,15 @@ function QandA(args) {
                     width: "40px", height:"40px", padding:"10px"
                 }}/> : <div/>}
             </p>
+            <div>
+                {
+                    args.stamps.map((value, i) => {
+                    return (
+                        <input type="submit" id={value} value={"Ref " + (i+1)} onClick={seek}/>
+                    )
+                    })
+                }
+            </div>
 		</div>
 	);
 }
