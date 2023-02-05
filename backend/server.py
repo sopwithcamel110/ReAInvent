@@ -1,4 +1,5 @@
 # Import modules
+from importlib.machinery import FrozenImporter
 from flask import Flask, jsonify, request
 from flask_restful import Resource, Api
 import whisper
@@ -28,13 +29,21 @@ ENCODING = "cl100k_base"  # encoding for text-embedding-ada-002
 encoding = tiktoken.get_encoding(ENCODING)
 separator_len = len(encoding.encode(SEPARATOR))
 df = None 
+url = None
+output_transcript = None
 document_embeddings =  None
+vid_length = None
 COMPLETIONS_API_PARAMS = {
     # We use temperature of 0.0 because it gives the most predictable, factual answer.
     "temperature": 0.0,
     "max_tokens": 500,
     "model": COMPLETIONS_MODEL,
 }
+#holding arrays before index processing 
+arrInds = [] 
+#array holding a tuple value of (time, youtube_url) for relevant points of the video
+timestamps = [] 
+
 
 # Create resources
 class ValidateURL(Resource):
@@ -71,6 +80,7 @@ def answer_query_with_context(query,df,document_embeddings,show_prompt):
     return response["choices"][0]["text"].strip(" \n")
 
 def construct_prompt(question, context_embeddings, df):
+    global arrayInds
     most_relevant_document_sections = order_document_sections_by_query_similarity(question, context_embeddings)
     
     chosen_sections = []
@@ -92,6 +102,8 @@ def construct_prompt(question, context_embeddings, df):
     # print(f"Selected {len(chosen_sections)} document sections:")
     # print("\n".join(chosen_sections_indexes))
     
+    arrInds = chosen_sections_indexes
+
     header = """Answer the question as truthfully as possible using the provided context from a video, and if the answer is not contained within the text below, say "I don't know."\n\nContext:\n"""
     
     return header + "".join(chosen_sections) + "\n\n Q: " + question + "\n A:"
@@ -130,8 +142,11 @@ class GenerateTranscript(Resource):
     def get(self):
         global df
         global document_embeddings
+        global output_transcript
+        global vid_length
         youtube_video_url = url
         vid = YouTube(youtube_video_url)
+        vid_length = vid.length
         streams = vid.streams.filter(only_audio=True)
 
         if(not os.path.exists("./content")):
@@ -201,6 +216,7 @@ class GenerateTranscript(Resource):
 
         #   output = model.transcribe(Path("content//Indus Valley Civilization   Early Civilizations  World History  Khan Academy.mp3"))\
         output = version.predict(**inputs)
+        output_transcript = output
 
         with open('./content/output.csv', 'w', newline='') as file:
             writer = csv.writer(file)
@@ -234,3 +250,64 @@ api.add_resource(AnswerQuestion, "/ask")
 # Driver
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+# ████████╗██╗███╗░░░███╗███████╗░██████╗████████╗░█████╗░███╗░░░███╗██████╗░  ░█████╗░░█████╗░██████╗░███████╗
+# ╚══██╔══╝██║████╗░████║██╔════╝██╔════╝╚══██╔══╝██╔══██╗████╗░████║██╔══██╗  ██╔══██╗██╔══██╗██╔══██╗██╔════╝
+# ░░░██║░░░██║██╔████╔██║█████╗░░╚█████╗░░░░██║░░░███████║██╔████╔██║██████╔╝  ██║░░╚═╝██║░░██║██║░░██║█████╗░░
+# ░░░██║░░░██║██║╚██╔╝██║██╔══╝░░░╚═══██╗░░░██║░░░██╔══██║██║╚██╔╝██║██╔═══╝░  ██║░░██╗██║░░██║██║░░██║██╔══╝░░
+# ░░░██║░░░██║██║░╚═╝░██║███████╗██████╔╝░░░██║░░░██║░░██║██║░╚═╝░██║██║░░░░░  ╚█████╔╝╚█████╔╝██████╔╝███████╗
+# ░░░╚═╝░░░╚═╝╚═╝░░░░░╚═╝╚══════╝╚═════╝░░░░╚═╝░░░╚═╝░░╚═╝╚═╝░░░░░╚═╝╚═╝░░░░░  ░╚════╝░░╚════╝░╚═════╝░╚══════╝
+
+# MADE BY RITESH:
+
+# getting the indices from the string into an array
+def makeNumArr():
+    num = arrInds
+    arr = []
+    for i in range(len(num)):
+        arr.append(int(num[i][10:len(num[i])-1]))
+    return arr 
+
+def get_start_and_end():
+    arrNum = makeNumArr()
+    output = output_transcript
+
+    arrPut = output['segments']
+
+    arrTime = []
+    for i in range(len(arrNum)):
+        text = df['content'][arrNum[i]-1]
+        text = text.strip()
+        text = text.lower()
+        for j in range(len(arrPut)):
+            temp = arrPut[j]['text']
+            temp = temp.strip()
+            temp = temp.lower()
+            if temp == text: 
+                arrTime.append( ( int(arrPut[j]['start']) , int(arrPut[j]['end'] )) )
+
+        return arrTime
+
+def getLinks():
+    arrTimes = get_start_and_end()
+    sorted(arrTimes)
+    arrLink = [] 
+
+    for i in range(len(arrTimes)):
+        arrLink.append(url+'&t='+str(arrTimes[i][0]-3)+'s')
+    
+    return arrLink
+
+def filterLinks():
+    ratio = 0.3
+    capped = min(ratio*vid_length, 10)
+
+    links = getLinks()
+    fin_links = []
+
+    while(count <= capped):
+        fin_links.append(links[count])
+        count += 1 
+    
+    return fin_links
