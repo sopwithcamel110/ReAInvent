@@ -50,21 +50,6 @@ class LoadModel(Resource):
 
         return jsonify({'Completed' : 1})
 
-class ValidateURL(Resource):
-    def get(self, desc=""):
-        # Set valid to 1 if url is valid
-        # desc: YouTube url descriptor https://www.youtube.com/watch?v=     ----> cdZZpaB2kDM
-        global vid
-        url = "https://www.youtube.com/watch?v=" + desc
-        try:
-            vid = YouTube(url)
-            valid = 1
-        except:
-            valid = 0
-        
-        #END CODE
-        return jsonify({'Valid' : valid})
-
 #needed methods
 def answer_query_with_context(query,df,document_embeddings,show_prompt):
     # print("embeddings debug: ")
@@ -168,6 +153,7 @@ class GenerateTranscript(Resource):
     def get(self):
         global df
         global document_embeddings
+        global output_transcript
         streams = vid.streams.filter(only_audio=True)
 
         if(not os.path.exists("./content")):
@@ -176,70 +162,71 @@ class GenerateTranscript(Resource):
         stream = streams.first()
         out_file=stream.download(filename='./content/video.mp3')
 
-
-
-        model = replicate.models.get("openai/whisper")
-        version = model.versions.get("23241e5731b44fcb5de68da8ebddae1ad97c5094d24f94ccb11f7c1d33d661e2")
-
-        inputs = {
-            # Audio file
-            'audio': open("./content/video.mp3", "rb"),
-
-            # Choose a Whisper model.
-            'model': "tiny",
-
-            # Choose the format for the transcription
-            'transcription': "plain text",
-
-            # Translate the text to English when set to True
-            'translate': False,
-
-            # language spoken in the audio, specify None to perform language
-            # detection
-            # 'language': ...,
-
-            # temperature to use for sampling
-            'temperature': 0,
-
-            # optional patience value to use in beam decoding, as in
-            # https://arxiv.org/abs/2204.05424, the default (1.0) is equivalent to
-            # conventional beam search
-            # 'patience': ...,
-
-            # comma-separated list of token ids to suppress during sampling; '-1'
-            # will suppress most special characters except common punctuations
-            'suppress_tokens': "-1",
-
-            # optional text to provide as a prompt for the first window.
-            # 'initial_prompt': ...,
-
-            # if True, provide the previous output of the model as a prompt for
-            # the next window; disabling may make the text inconsistent across
-            # windows, but the model becomes less prone to getting stuck in a
-            # failure loop
-            'condition_on_previous_text': True,
-
-            # temperature to increase when falling back when the decoding fails to
-            # meet either of the thresholds below
-            'temperature_increment_on_fallback': 0.2,
-
-            # if the gzip compression ratio is higher than this value, treat the
-            # decoding as failed
-            'compression_ratio_threshold': 2.4,
-
-            # if the average log probability is lower than this value, treat the
-            # decoding as failed
-            'logprob_threshold': -1,
-
-            # if the probability of the <|nospeech|> token is higher than this
-            # value AND the decoding has failed due to `logprob_threshold`,
-            # consider the segment as silence
-            'no_speech_threshold': 0.6,
-        }
-
-        #   output = model.transcribe(Path("content//Indus Valley Civilization   Early Civilizations  World History  Khan Academy.mp3"))\
-        output = version.predict(**inputs)
+        output = model.transcribe('./content/video.mp3')
         output_transcript = output
+
+        # model = replicate.models.get("openai/whisper")
+        # version = model.versions.get("23241e5731b44fcb5de68da8ebddae1ad97c5094d24f94ccb11f7c1d33d661e2")
+
+        # inputs = {
+        #     # Audio file
+        #     'audio': open("./content/video.mp3", "rb"),
+
+        #     # Choose a Whisper model.
+        #     'model': "tiny",
+
+        #     # Choose the format for the transcription
+        #     'transcription': "plain text",
+
+        #     # Translate the text to English when set to True
+        #     'translate': False,
+
+        #     # language spoken in the audio, specify None to perform language
+        #     # detection
+        #     # 'language': ...,
+
+        #     # temperature to use for sampling
+        #     'temperature': 0,
+
+        #     # optional patience value to use in beam decoding, as in
+        #     # https://arxiv.org/abs/2204.05424, the default (1.0) is equivalent to
+        #     # conventional beam search
+        #     # 'patience': ...,
+
+        #     # comma-separated list of token ids to suppress during sampling; '-1'
+        #     # will suppress most special characters except common punctuations
+        #     'suppress_tokens': "-1",
+
+        #     # optional text to provide as a prompt for the first window.
+        #     # 'initial_prompt': ...,
+
+        #     # if True, provide the previous output of the model as a prompt for
+        #     # the next window; disabling may make the text inconsistent across
+        #     # windows, but the model becomes less prone to getting stuck in a
+        #     # failure loop
+        #     'condition_on_previous_text': True,
+
+        #     # temperature to increase when falling back when the decoding fails to
+        #     # meet either of the thresholds below
+        #     'temperature_increment_on_fallback': 0.2,
+
+        #     # if the gzip compression ratio is higher than this value, treat the
+        #     # decoding as failed
+        #     'compression_ratio_threshold': 2.4,
+
+        #     # if the average log probability is lower than this value, treat the
+        #     # decoding as failed
+        #     'logprob_threshold': -1,
+
+        #     # if the probability of the <|nospeech|> token is higher than this
+        #     # value AND the decoding has failed due to `logprob_threshold`,
+        #     # consider the segment as silence
+        #     'no_speech_threshold': 0.6,
+        # }
+
+        # #   output = model.transcribe(Path("content//Indus Valley Civilization   Early Civilizations  World History  Khan Academy.mp3"))\
+        # output = version.predict(**inputs)
+        # output_transcript = output
 
         with open('./content/output.csv', 'w', newline='') as file:
             writer = csv.writer(file)
