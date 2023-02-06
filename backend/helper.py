@@ -11,10 +11,6 @@ SEPARATOR = "\n* "
 ENCODING = "cl100k_base"  # encoding for text-embedding-ada-002
 
 openai.api_key = os.environ.get("openai_key")
-
-
-arrInds = [] 
-
 COMPLETIONS_API_PARAMS = {
     # We use temperature of 0.0 because it gives the most predictable, factual answer.
     "temperature": 0.0,
@@ -98,7 +94,7 @@ def order_document_sections_by_query_similarity(query, contexts):
 #=====TIMESTAMP=CODE========
 #===========================
 
-def makeNumArr():
+def makeNumArr(arrInds):
     num = arrInds
     arr = []
     for i in range(len(num)):
