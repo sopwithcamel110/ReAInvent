@@ -40,7 +40,7 @@ pip install -r requirements.txt
 ```console 
 python ./backend/server.py
 ```
-_Note: You need to provide an OpenAI API key in a .env file within the backend directory. We are currently working on deploying this project but for now, running locally will require an API key. The .env file should have the text openai_key = "{API_KEY}".
+_Note: You need to provide an OpenAI API key in a .env file within the backend directory. We are currently working on deploying this project but for now, running locally will require an API key. The .env file should have the text `openai_key = "{API_KEY}"`.
 ## Start the Website
 ```console
 cd frontend
