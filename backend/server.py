@@ -16,6 +16,9 @@ import replicate
 import requests
 from youtube_transcript_api import YouTubeTranscriptApi
 from pytube import extract 
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Create Flask App
 app = Flask(__name__)
@@ -25,7 +28,7 @@ api = Api(app)
 # Global vars
 COMPLETIONS_MODEL = "text-davinci-003"
 EMBEDDING_MODEL = "text-embedding-ada-002"
-OPENAI_APIKEY = "XXX-XXX-XXX"
+OPENAI_APIKEY = os.environ.get("openai_key")
 MAX_SECTION_LEN = 500
 SEPARATOR = "\n* "
 ENCODING = "cl100k_base"  # encoding for text-embedding-ada-002
@@ -189,8 +192,6 @@ class LoadModel(Resource):
         return jsonify({'Completed' : 1})
 class ValidateURL(Resource):
     def get(self, desc=""):
-        # Set valid to 1 if url is valid
-        # desc: YouTube url descriptor https://www.youtube.com/watch?v=     ----> cdZZpaB2kDM
         global url
         global vid
         url = "https://www.youtube.com/watch?v=" + desc
