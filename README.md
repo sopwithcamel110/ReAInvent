@@ -1,7 +1,7 @@
 # CruzHacks2023
 
 ## Example:
-![Example of our project](https://imgur.com/a/QNkuqSt)
+![Example of our project](https://media.giphy.com/media/oepOUjo00amPeTO6ye/giphy.gif)
 
 ## Project description 
 
