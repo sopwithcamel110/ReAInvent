@@ -57,6 +57,7 @@ function App() {
       if (data.Completed === 1) {
         console.log("Transcript loaded.");
         setUrl("https://www.youtube.com/watch?v=" + desc)
+        setChat([]);
         questionRef.current.scrollIntoView({behavior: "smooth"});
         setProgress("");
       }
