@@ -1,7 +1,10 @@
 # CruzHacks2023
 
 ## Example:
-![Example of our project](https://media.giphy.com/media/oepOUjo00amPeTO6ye/giphy.gif)
+
+<img src="https://media.giphy.com/media/oepOUjo00amPeTO6ye/giphy.gif" width="250" height="250"/>
+
+
 
 ## Project description 
 
