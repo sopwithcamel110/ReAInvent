@@ -1,6 +1,7 @@
 # CruzHacks2023
 
-## Put GIF here
+## Example:
+![Example of our project](https://imgur.com/a/QNkuqSt)
 
 ## Project description 
 
