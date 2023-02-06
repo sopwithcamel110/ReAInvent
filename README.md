@@ -2,7 +2,9 @@
 
 ## Example:
 
-<img src="https://media.giphy.com/media/oepOUjo00amPeTO6ye/giphy.gif" width="250" height="250"/>
+<p align="center">
+  <img src="https://media.giphy.com/media/oepOUjo00amPeTO6ye/giphy.gif" alt="animated" />
+</p>
 
 
 
