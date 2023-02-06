@@ -18,7 +18,7 @@ Outside of just university students, this program can be used with any youtube v
 
 ## How does it work? 
 
-We use `pytube` and `youtube_transcript_api` to scrape a given youtube url for it's transcription. From there we run a semantic search with the query being the question asked by the client, and the document being the youtube transcription. To perform the semantic search, we use OpenAI's embedding models, and sort the transcription by cosine similarity in respect to the query in order to find the most relevant parts of the video for the question. We then feed the transcriptions as context to GPT-DaVinci, OpenAI's largest LLM, and the original question to achieve the accurate and diegestable responses you saw in the example.\
+We use `pytube` and `youtube_transcript_api` to scrape a given youtube url for its transcription. From there we run a semantic search with the query being the question asked by the client, and the document being the youtube transcription. To perform the semantic search, we use OpenAI's embedding models, and sort the transcription by cosine similarity in respect to the query in order to find the most relevant parts of the video for the question. We then feed the transcriptions as context to GPT-DaVinci, OpenAI's largest LLM, and the original question to achieve the accurate and diegestable responses you saw in the example.\
 
 We also use prompt engineering to prevent hallucinations (misinfomration) by GPT, and include relevant timestamps so you can quickly watch back the sections you are looking for.
 
