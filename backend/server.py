@@ -15,12 +15,15 @@ import requests
 from youtube_transcript_api import YouTubeTranscriptApi
 from pytube import extract 
 from dotenv import load_dotenv
+from flask_cors import CORS
 import helper
+
 
 load_dotenv()
 
 # Create Flask App
 app = Flask(__name__)
+CORS(app)
 # Create API Object
 api = Api(app)
 
