@@ -2,6 +2,9 @@ import openai
 import pandas as pd
 import numpy as np
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 COMPLETIONS_MODEL = "text-davinci-003"
 EMBEDDING_MODEL = "text-embedding-ada-002"
