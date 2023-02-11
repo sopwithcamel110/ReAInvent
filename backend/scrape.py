@@ -76,7 +76,10 @@ while(True):
     question = input("Enter a question: ")
     if(question == 'q'):
         break
+    print("__________________RESPONSE_____________________")
     answer = helper.answer_query_with_context(question, df, document_embeddings, False)
     print(answer)
+    print("__________________TIME STAMPS_________________")
+    print(helper.filterLinks(0, df, None, is_article=True))
 
 
