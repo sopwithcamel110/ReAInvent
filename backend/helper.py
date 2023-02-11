@@ -6,6 +6,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
+
 COMPLETIONS_MODEL = "text-davinci-003"
 EMBEDDING_MODEL = "text-embedding-ada-002"
 
@@ -101,7 +103,7 @@ def makeNumArr(arrInds):
     num = arrInds
     arr = []
     for i in range(len(num)):
-        arr.append(int(num[i][10:len(num[i])-1]))
+        arr.append(int(num[i][12:len(num[i])-1]))
     return arr 
 
 def get_start_and_end(output_transcript, df):
@@ -134,16 +136,23 @@ def getLinks(df, output_transcript):
     
     return arrLink
 
-def filterLinks(vid_length, df, output_transcript):
-    count = 0
-    ratio = 0.116
-    capped = min(int(ratio*vid_length/60), 10)
+def filterLinks(vid_length, df, output_transcript, is_article=False):
+    if(is_article):
+        arrNum = makeNumArr(arrInds)
+        text = " "
+        for i in range(3):
+            text += f"Quote {i+1}: "  + df['content'][arrNum[i]-1] + "\n"
+        return text
+    else:
+        count = 0
+        ratio = 0.116
+        capped = min(int(ratio*vid_length/60), 10)
 
-    links = getLinks(df, output_transcript)
-    fin_links = []
+        links = getLinks(df, output_transcript)
+        fin_links = []
 
-    while(count <= capped):
-        fin_links.append(links[count])
-        count += 1 
-    
-    return fin_links
+        while(count <= capped):
+            fin_links.append(links[count])
+            count += 1 
+        
+        return fin_links
