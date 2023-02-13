@@ -15,15 +15,12 @@ import requests
 from youtube_transcript_api import YouTubeTranscriptApi
 from pytube import extract 
 from dotenv import load_dotenv
-from flask_cors import CORS
 import helper
-
 
 load_dotenv()
 
 # Create Flask App
 app = Flask(__name__)
-CORS(app)
 # Create API Object
 api = Api(app)
 
@@ -67,8 +64,8 @@ class GenerateTranscript(Resource):
         global vid_length
         global output_transcript
         #create the csv file from the transcript
-        if (not os.path.exists("./content")):
-            os.mkdir("./content")
+        # if (not os.path.exists("./content")):
+        #     os.mkdir("./content")
         youtube_video_url = url
         vid = YouTube(youtube_video_url)
         streams = vid.streams.filter(only_audio=True)
@@ -78,6 +75,7 @@ class GenerateTranscript(Resource):
         fin_out = []
         count = 0 
 
+        #combining sentences in transcript
         for seg in output: 
             if(count >= len(output) - 8):
                 break
@@ -88,17 +86,15 @@ class GenerateTranscript(Resource):
                 count += 8
         output = fin_out
         output_transcript = output
-        with open('./content/output.csv', 'w', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow(["title", "heading", "content", "tokens"])
-            content = []
-            count = 0 
-            for seg in output: 
-                count += 1
-                writer.writerow(["video", str(count), seg['text']])
 
-        df = pd.read_csv('./content/output.csv')
+        #making csv file 
+        arr = [] 
+        for seg in output: 
+            arr.append(seg['text'])
+        data = {'title': ['video' for i in range(len(output))], 'heading': [i+1 for i in range(len(output))], 'content': arr, "tokens" : [None for i in range(len(output))]}
+        df = pd.DataFrame(data)
         df = df.set_index(["title", "heading"])
+
         document_embeddings = helper.compute_doc_embeddings(df)
         return jsonify({'Completed' : 1})
 
