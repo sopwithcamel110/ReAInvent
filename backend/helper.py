@@ -103,7 +103,7 @@ def makeNumArr(arrInds):
     num = arrInds
     arr = []
     for i in range(len(num)):
-        arr.append(int(num[i][12:len(num[i])-1]))
+        arr.append(int(num[i][10:len(num[i])-1]))
     return arr 
 
 def get_start_and_end(output_transcript, df):
