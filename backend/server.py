@@ -60,8 +60,6 @@ class Ping(Resource):
         return jsonify({'message' : "Pong!"})
 
 class GenerateTranscript(Resource):
-    def remove_non_ascii(string):
-        return ''.join(char for char in string if ord(char) < 128)
     def get(self):
         global df
         global document_embeddings
@@ -85,7 +83,7 @@ class GenerateTranscript(Resource):
                 break
             else:
                 string = output[count]['text'] + " " + output[count+1]['text']+ " " + output[count+2]['text'] + " " + output[count+3]['text'] + output[count+4]['text'] + output[count+5]['text'] + output[count+6]['text'] + output[count+7]['text']
-                string = remove_non_ascii(string)
+                string = helper.remove_non_ascii(string)
                 start = output[count]['start']
                 fin_out.append({'text': string, 'start':start, 'end':-1})
                 count += 8
