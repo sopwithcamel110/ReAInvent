@@ -93,6 +93,8 @@ def order_document_sections_by_query_similarity(query, contexts):
     ], reverse=True)
     
     return document_similarities
+def remove_non_ascii(string):
+    return ''.join(char for char in string if ord(char) < 128)
 
 
 #===========================
