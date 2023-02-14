@@ -1,6 +1,7 @@
 # Import modules
 from importlib.machinery import FrozenImporter
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 from flask_restful import Resource, Api
 from pytube import YouTube
 import csv
@@ -21,6 +22,7 @@ load_dotenv()
 
 # Create Flask App
 app = Flask(__name__)
+CORS(app)
 # Create API Object
 api = Api(app)
 

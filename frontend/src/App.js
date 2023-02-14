@@ -30,7 +30,7 @@ function App() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ question: text })
     };
-    fetch('http://127.0.0.1:5000/ask', requestOptions)
+    fetch('http://34.118.241.64:5000/ask', requestOptions)
       .then(response => response.json())
       .then(data => {
         console.log(data.stamps);
@@ -40,7 +40,7 @@ function App() {
 
   function LoadModel() {
     setProgress("Loading Model...");
-    fetch("http://127.0.0.1:5000/loadmodel")
+    fetch("http://34.118.241.64:5000/loadmodel")
     .then((response) => response.json())
     .then((data) => {
       if (data.Completed === 1) {
@@ -51,7 +51,7 @@ function App() {
 
   function GenerateTranscript() {
     setProgress("Fetching Transcript...");
-    fetch("http://127.0.0.1:5000/gentranscript")
+    fetch("http://34.118.241.64:5000/gentranscript")
     .then((response) => response.json())
     .then((data) => {
       if (data.Completed === 1) {
@@ -74,7 +74,7 @@ function App() {
     // Isolate descriptor from youtube link
     desc = (text.replace("https://", "")).replace("www.youtube.com/watch?v=", "");
     // Create get request
-    fetch("http://127.0.0.1:5000/validate/"+desc)
+    fetch("http://34.118.241.64:5000/validate/" + desc)
     .then((response) => response.json())
     .then((data) => {
       if (data.Valid === 1) {
