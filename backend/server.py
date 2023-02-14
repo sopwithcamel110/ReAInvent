@@ -61,6 +61,7 @@ class Ping(Resource):
 
 class GenerateTranscript(Resource):
     def get(self):
+        global url
         global df
         global document_embeddings
         global vid_length
@@ -118,4 +119,4 @@ api.add_resource(LoadModel, "/loadmodel")
 
 # Driver
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
