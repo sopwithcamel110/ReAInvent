@@ -41,7 +41,7 @@ function App() {
 
   function LoadModel() {
     setProgress("Loading Model...");
-    fetch(API_ENDPOINT+ "/loadmodel")
+    fetch(API_ENDPOINT + "/loadmodel")
     .then((response) => response.json())
     .then((data) => {
       if (data.Completed === 1) {
