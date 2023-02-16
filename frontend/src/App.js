@@ -4,15 +4,23 @@ import "./App.css";
 import QandA from './QandA.js';
 import { FiSend } from 'react-icons/fi';
 import {GrYoutube} from 'react-icons/gr';
+import { AtomLoader } from "react-loaders-kit";
 
 function App() {
   const API_ENDPOINT = "/api";
-  const textRef = useRef();
+  const urlInputRef = useRef();
   const questionRef = useRef();
   const playerRef = useRef();
   const [url, setUrl] = useState();
   const [progress, setProgress] = useState();
   const [chat, setChat] = useState([]);
+  const [transcriptLoader, showTranscriptLoader] = useState(false);
+  const loaderProps = {
+    loading: true,
+    size: 80,
+    duration: 2,
+    colors: ["#FF2900", "#FF5500", "#FFE600"],
+  };
   let desc = "None";
 
   function handleQuestionEnter(e) {
@@ -59,16 +67,18 @@ function App() {
         console.log("Transcript loaded.");
         setUrl("https://www.youtube.com/watch?v=" + desc)
         setChat([]);
-        questionRef.current.scrollIntoView({behavior: "smooth"});
+        playerRef.current.scrollIntoView({behavior: "smooth"});
         setProgress("");
+        showTranscriptLoader(false);
       }
     });
   }
 
   function HandleAnalyzeClicked(e) {
     setProgress("Validating URL...");
+
     // Get input
-    let text = textRef.current.value;
+    let text = urlInputRef.current.value;
     if (text === "") {
       text = "None"
     }
@@ -80,6 +90,7 @@ function App() {
     .then((data) => {
       if (data.Valid === 1) {
         // Cleanup
+        showTranscriptLoader(true);
         LoadModel();
       }
       else {
@@ -102,14 +113,18 @@ function App() {
         <GrYoutube color = "red" size = "30px" style = {{
           marginLeft: "-20px", marginBottom: "-7px"
         }}/>
-        <input id="urlTextInput" name="linkInput" type="text" ref={textRef}/>
+        <input id="urlTextInput" name="linkInput" type="text" ref={urlInputRef}/>
       </div>
       <br/>
       <input type="submit" id="analyzeBtn" value="Analyze" onClick={HandleAnalyzeClicked}/>
       <br/>
       <h3>{progress}</h3>
-      <ReactPlayer ref={playerRef} controls="true" url={url} id="videoplayer" style= {{
-      }}/>
+      {
+        transcriptLoader ? (<div className="progressLoader"><AtomLoader {...loaderProps}/></div>) : (<div/>)
+      }
+      <div ref={playerRef}>
+        <ReactPlayer controls={true} url={url} id="videoplayer"/>
+      </div>
       <div className="chatbox">
         <div className="questionInput">
           <input id="questionTextInput" type="text" ref={questionRef} onKeyDown={handleQuestionEnter}/>
