@@ -1,6 +1,6 @@
 # Import modules
 from importlib.machinery import FrozenImporter
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, session
 from flask_cors import CORS
 from flask_restful import Resource, Api
 from pytube import YouTube
@@ -44,10 +44,10 @@ class LoadModel(Resource):
 class ValidateURL(Resource):
     def get(self, desc=""):
         global url
-        global vid
         url = "https://www.youtube.com/watch?v=" + desc
+        session['url'] = url 
         try:
-            vid = YouTube(url)
+            session['vid'] = vid 
             valid = 1
         except:
             valid = 0
@@ -66,14 +66,13 @@ class GenerateTranscript(Resource):
         global document_embeddings
         global vid_length
         global output_transcript
-        #create the csv file from the transcript
-        # if (not os.path.exists("./content")):
-        #     os.mkdir("./content")
-        youtube_video_url = url
+        youtube_video_url = session.get('url')
         vid = YouTube(youtube_video_url)
+        session['vid'] = vid 
         streams = vid.streams.filter(only_audio=True)
         id=extract.video_id(youtube_video_url)
         vid_length = vid.length
+        session['vid_length'] = vid.length
         output = YouTubeTranscriptApi.get_transcript(id, languages=['en'])
         fin_out = []
         count = 0 
@@ -90,24 +89,27 @@ class GenerateTranscript(Resource):
                 count += 8
         output = fin_out
         output_transcript = output
+        session['output_transcript'] = output
 
-        #making csv file 
+        #making dataframe  
         arr = [] 
         for seg in output: 
             arr.append(seg['text'])
         data = {'title': ['video' for i in range(len(output))], 'heading': [i+1 for i in range(len(output))], 'content': arr, "tokens" : [None for i in range(len(output))]}
         df = pd.DataFrame(data)
         df = df.set_index(["title", "heading"])
+        session['df'] = df
 
         document_embeddings = helper.compute_doc_embeddings(df)
+        session['document_embedings'] = document_embeddings
         return jsonify({'Completed' : 1})
 
 class AnswerQuestion(Resource):
     def post(self):
         content = request.json
         question = content['question']
-        answer =  helper.answer_query_with_context(question, df, document_embeddings, False)
-        stamps = helper.filterLinks(vid_length, df, output_transcript)
+        answer =  helper.answer_query_with_context(question, session.get('df'), session.get('document_embeddings'), False)
+        stamps = helper.filterLinks(session.get('vid_length'), session.get('df'), session.get('output_transcript'))
         return jsonify({"answer": answer, "stamps" : stamps})
 
 
