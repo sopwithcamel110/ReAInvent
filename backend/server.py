@@ -22,6 +22,7 @@ load_dotenv()
 
 # Create Flask App
 app = Flask(__name__)
+SESSION_TYPE = 'filesystem'
 CORS(app)
 # Create API Object
 api = Api(app)
@@ -47,7 +48,7 @@ class ValidateURL(Resource):
         url = "https://www.youtube.com/watch?v=" + desc
         session['url'] = url 
         try:
-            session['vid'] = vid 
+            _ = YouTube(url)
             valid = 1
         except:
             valid = 0
@@ -68,11 +69,10 @@ class GenerateTranscript(Resource):
         global output_transcript
         youtube_video_url = session.get('url')
         vid = YouTube(youtube_video_url)
-        session['vid'] = vid 
         streams = vid.streams.filter(only_audio=True)
         id=extract.video_id(youtube_video_url)
         vid_length = vid.length
-        session['vid_length'] = vid.length
+        session['vid_length'] = str(vid.length)
         output = YouTubeTranscriptApi.get_transcript(id, languages=['en'])
         fin_out = []
         count = 0 
@@ -98,7 +98,7 @@ class GenerateTranscript(Resource):
         data = {'title': ['video' for i in range(len(output))], 'heading': [i+1 for i in range(len(output))], 'content': arr, "tokens" : [None for i in range(len(output))]}
         df = pd.DataFrame(data)
         df = df.set_index(["title", "heading"])
-        session['df'] = df
+        session['df'] = df.to_dict('list')
 
         document_embeddings = helper.compute_doc_embeddings(df)
         session['document_embedings'] = document_embeddings
@@ -108,8 +108,11 @@ class AnswerQuestion(Resource):
     def post(self):
         content = request.json
         question = content['question']
-        answer =  helper.answer_query_with_context(question, session.get('df'), session.get('document_embeddings'), False)
-        stamps = helper.filterLinks(session.get('vid_length'), session.get('df'), session.get('output_transcript'))
+        dict_obj = session['df'] if 'df' in session else ""  
+        df = pd.DataFrame(dict_obj)
+        df = df.set_index(["title", "heading"])
+        answer =  helper.answer_query_with_context(question, df, session.get('document_embeddings'), False)
+        stamps = helper.filterLinks(int(session.get('vid_length')), df, session.get('output_transcript'))
         return jsonify({"answer": answer, "stamps" : stamps})
 
 
@@ -121,4 +124,5 @@ api.add_resource(LoadModel, "/loadmodel")
 
 # Driver
 if __name__ == '__main__':
-    app.run()
+    app.secret_key = 'super secret key'
+    app.run(host='localhost', port=3000, debug=True)
