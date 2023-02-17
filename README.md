@@ -1,5 +1,6 @@
 # CruzHacks2023
 Hosted live at https://reainvent.com/
+(Currently undergoing maintainence)
 ## Example:
 
 <p align="center">
@@ -22,6 +23,8 @@ We use `pytube` and `youtube_transcript_api` to scrape a given youtube url for i
 
 We also use prompt engineering to prevent hallucinations (misinfomration) by GPT, and include relevant timestamps so you can quickly watch back the sections you are looking for.
 
+# How to run
+
 ## Create a virtual environment
 1. Start by navigating to the project directory
 2. Create the virtual environment
@@ -42,9 +45,17 @@ python3 ./backend/server.py
 ```
 _Note: You need to provide an OpenAI API key in a .env file within the backend directory. We are currently working on deploying this project but for now, running locally will require an API key. The .env file should have the text `openai_key = "{API_KEY}"`._
 ## Start the Website
+When running in development mode, make sure to set this line at the top of App.js so the site can communicate with the API. By default, it is set to "/api"
+```console
+const API_ENDPOINT = "";
+```
+Now, start the website.
 ```console
 cd frontend
 npm start
 ```
 
 Navigate to localhost:3000 to view the webserver.
+
+### Note
+These instructions are for running the project in development mode. You can build the API and frontend for production in a variety of ways. Currently, ReAInvent is hosted on a Google Cloud VM, using Gunicorn for hosting the backend, and Nginx for the frontend.
