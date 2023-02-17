@@ -47,13 +47,49 @@ function App() {
       });
   }
 
-  function LoadModel() {
-    setProgress("Loading Model...");
-    fetch(API_ENDPOINT + "/loadmodel")
+  function CheckServerStatus() {
+    setProgress("Checking server status...");
+    fetch(API_ENDPOINT + "/ping")
+    .then((response) => {
+      if (!response.ok) {
+        setProgress("Server is offline. Please try again later.");
+        throw new Error(response.status);
+      }
+      else {
+        return response.json();
+      }
+    })
+    .then((data) => {
+      if (data.message === "Pong!") {
+        ValidateURL();
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+  }
+
+  function ValidateURL() {
+    setProgress("Validating URL...");
+
+    // Get input
+    let text = urlInputRef.current.value;
+    if (text === "") {
+      text = "None"
+    }
+    // Isolate descriptor from youtube link
+    desc = (text.replace("https://", "")).replace("www.youtube.com/watch?v=", "");
+    // Create get request
+    fetch(API_ENDPOINT + "/validate/" + desc)
     .then((response) => response.json())
     .then((data) => {
-      if (data.Completed === 1) {
+      if (data.Valid === 1) {
+        // Cleanup
+        showTranscriptLoader(true);
         GenerateTranscript();
+      }
+      else {
+        setProgress("Invalid URL.");
       }
     });
   }
@@ -75,28 +111,7 @@ function App() {
   }
 
   function HandleAnalyzeClicked(e) {
-    setProgress("Validating URL...");
-
-    // Get input
-    let text = urlInputRef.current.value;
-    if (text === "") {
-      text = "None"
-    }
-    // Isolate descriptor from youtube link
-    desc = (text.replace("https://", "")).replace("www.youtube.com/watch?v=", "");
-    // Create get request
-    fetch(API_ENDPOINT + "/validate/" + desc)
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.Valid === 1) {
-        // Cleanup
-        showTranscriptLoader(true);
-        LoadModel();
-      }
-      else {
-        setProgress("Invalid URL.");
-      }
-    });
+    CheckServerStatus();
   }
 
 	return (

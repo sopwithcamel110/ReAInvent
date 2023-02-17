@@ -22,38 +22,25 @@ load_dotenv()
 
 # Create Flask App
 app = Flask(__name__)
-SESSION_TYPE = 'filesystem'
+app.secret_key = 'cruzhacks2023'
+app.config['SESSION_TYPE'] = 'filesystem'
 CORS(app)
+
 # Create API Object
 api = Api(app)
 
-# Global vars
-df = None 
-arrInds = None 
-output_transcript = None
-document_embeddings =  None
-vid_length = None
-vid = None
-
-# API
 # Create resources
-class LoadModel(Resource):
-    def get(self):
-        # model = whisper.load_model("small")
-        return jsonify({'Completed' : 1})
 
 class ValidateURL(Resource):
     def get(self, desc=""):
-        global url
         url = "https://www.youtube.com/watch?v=" + desc
-        session['url'] = url 
         try:
             _ = YouTube(url)
             valid = 1
         except:
             valid = 0
-        
-        #END CODE
+
+        session['url'] = url 
         return jsonify({'Valid' : valid})
         
 class Ping(Resource):
@@ -62,57 +49,57 @@ class Ping(Resource):
 
 class GenerateTranscript(Resource):
     def get(self):
-        global url
-        global df
-        global document_embeddings
-        global vid_length
-        global output_transcript
-        youtube_video_url = session.get('url')
-        vid = YouTube(youtube_video_url)
-        streams = vid.streams.filter(only_audio=True)
-        id=extract.video_id(youtube_video_url)
-        vid_length = vid.length
-        session['vid_length'] = str(vid.length)
-        output = YouTubeTranscriptApi.get_transcript(id, languages=['en'])
+        url = session.get('url')
+        vid = YouTube(url)
+
+        id=extract.video_id(url)
+        # transcript: list of dictionaries with start, text, duration keys
+        transcript = YouTubeTranscriptApi.get_transcript(id, languages=['en'])
         fin_out = []
         count = 0 
 
         #combining sentences in transcript
-        for seg in output: 
-            if(count >= len(output) - 8):
+        CHUNK_SIZE = 8
+        for seg in transcript: 
+            if(count >= len(transcript) - CHUNK_SIZE):
                 break
             else:
-                string = output[count]['text'] + " " + output[count+1]['text']+ " " + output[count+2]['text'] + " " + output[count+3]['text'] + output[count+4]['text'] + output[count+5]['text'] + output[count+6]['text'] + output[count+7]['text']
-                string = helper.remove_non_ascii(string)
-                start = output[count]['start']
-                fin_out.append({'text': string, 'start':start, 'end':-1})
-                count += 8
-        output = fin_out
-        output_transcript = output
-        session['output_transcript'] = output
+                sentence = ""
+                for i in range(CHUNK_SIZE):
+                    sentence += transcript[count + i]['text'] + " "
+                sentence = helper.remove_non_ascii(sentence)
+                start = transcript[count]['start']
+                fin_out.append({'text': sentence, 'start':start, 'end':-1})
+                count += CHUNK_SIZE
+        
+        session['transcript'] = fin_out
 
         #making dataframe  
         arr = [] 
-        for seg in output: 
+        for seg in transcript: 
             arr.append(seg['text'])
-        data = {'title': ['video' for i in range(len(output))], 'heading': [i+1 for i in range(len(output))], 'content': arr, "tokens" : [None for i in range(len(output))]}
+        data = {'title': ['video' for i in range(len(transcript))], 'heading': [i+1 for i in range(len(transcript))], 'content': arr, "tokens" : [None for i in range(len(transcript))]}
+        
         df = pd.DataFrame(data)
         df = df.set_index(["title", "heading"])
         session['df'] = df.to_dict('list')
 
         document_embeddings = helper.compute_doc_embeddings(df)
-        session['document_embedings'] = document_embeddings
+
+        session['embeddings'] = document_embeddings
+        session['vid_length'] = str(vid.length)
         return jsonify({'Completed' : 1})
 
 class AnswerQuestion(Resource):
     def post(self):
         content = request.json
         question = content['question']
-        dict_obj = session['df'] if 'df' in session else ""  
+
+        dict_obj = session['df'] if 'df' in session else "" 
         df = pd.DataFrame(dict_obj)
         df = df.set_index(["title", "heading"])
-        answer =  helper.answer_query_with_context(question, df, session.get('document_embeddings'), False)
-        stamps = helper.filterLinks(int(session.get('vid_length')), df, session.get('output_transcript'))
+        answer = helper.answer_query_with_context(question, df, session['embeddings'], False)
+        stamps = helper.filterLinks(int(session['vid_length']), df, session['transcript'])
         return jsonify({"answer": answer, "stamps" : stamps})
 
 
@@ -120,9 +107,9 @@ class AnswerQuestion(Resource):
 api.add_resource(ValidateURL, "/validate/<desc>")
 api.add_resource(GenerateTranscript, "/gentranscript")
 api.add_resource(AnswerQuestion, "/ask")
-api.add_resource(LoadModel, "/loadmodel")
+api.add_resource(Ping, "/ping")
 
 # Driver
 if __name__ == '__main__':
     app.secret_key = 'super secret key'
-    app.run(host='localhost', port=3000, debug=True)
+    app.run(host='localhost', port=5000, debug=True)
