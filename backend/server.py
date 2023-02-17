@@ -16,6 +16,7 @@ import requests
 from youtube_transcript_api import YouTubeTranscriptApi
 from pytube import extract 
 from dotenv import load_dotenv
+from json import dumps, loads
 import helper
 
 load_dotenv()
@@ -82,7 +83,7 @@ class GenerateTranscript(Resource):
         
         df = pd.DataFrame(data)
         df = df.set_index(["title", "heading"])
-        session['df'] = df.to_dict('list')
+        session['df'] = dumps(df.to_dict('list'))
 
         document_embeddings = helper.compute_doc_embeddings(df)
 
@@ -96,7 +97,7 @@ class AnswerQuestion(Resource):
         question = content['question']
 
         dict_obj = session['df'] if 'df' in session else "" 
-        df = pd.DataFrame(dict_obj)
+        df = pd.DataFrame(loads(dict_obj))
         df = df.set_index(["title", "heading"])
         answer = helper.answer_query_with_context(question, df, session['embeddings'], False)
         stamps = helper.filterLinks(int(session['vid_length']), df, session['transcript'])

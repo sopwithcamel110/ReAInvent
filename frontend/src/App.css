@@ -1,14 +1,6 @@
-h1 {
-    font-size: 60px;
-    display: inline;
-}
-.titleAI {
-    background: -webkit-linear-gradient(0deg, #FF2900 0%, #FFE600 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
 body {
-    margin-top: 150px;
+    margin: 0;
+    padding: 0;
     text-align: center;
     background-color: #000000;
     font-family: Söhne,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif,Helvetica Neue,Arial,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;
@@ -21,6 +13,18 @@ body {
     font-style: normal;
     font-variant: normal;
     text-transform: none;
+}
+.title {
+    margin-top: 80px;
+}
+h1 {
+    font-size: 60px;
+    display: inline;
+}
+.titleAI {
+    background: -webkit-linear-gradient(0deg, #FF2900 0%, #FFE600 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 .urlInput {
     height: 40px;

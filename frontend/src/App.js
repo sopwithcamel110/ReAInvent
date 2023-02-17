@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import ReactPlayer from 'react-player'
 import "./App.css";
 import Chatbox from './Chatbox.js';
+import Header from './Header.js';
 import { GrYoutube } from 'react-icons/gr';
 import { AtomLoader } from "react-loaders-kit";
 
@@ -90,11 +91,12 @@ function App() {
 
 	return (
 		<>
-			<header className="App-header">
-				<h1>Re</h1>
+      <Header/>
+      <div className="title">
+        <h1>Re</h1>
         <h1 className="titleAI">AI</h1>
         <h1>nvent</h1>
-			</header>
+      </div>
       <h3>
         Enter Youtube URL below:
       </h3>
@@ -111,11 +113,13 @@ function App() {
       {
         transcriptLoader ? (<div className="progressLoader"><AtomLoader {...loaderProps}/></div>) : (<div/>)
       }
-      <div ref={playerRef}>
-        <ReactPlayer controls={true} url={url} id="videoplayer"/>
-      </div>
       {
-        chatbox ? <Chatbox playerRef={playerRef} endpoint={API_ENDPOINT}/> : <div/>
+        chatbox ? <div>
+                    <div ref={playerRef}>
+                      <ReactPlayer controls={true} url={url} id="videoplayer"/>
+                    </div>
+                    <Chatbox playerRef={playerRef} endpoint={API_ENDPOINT}/>
+                  </div> : <div/>
       }
 		</>
 	);
