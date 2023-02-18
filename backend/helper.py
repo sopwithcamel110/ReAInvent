@@ -3,6 +3,9 @@ import pandas as pd
 import numpy as np
 import os
 from dotenv import load_dotenv
+from flask_session import Session
+from flask import Flask, jsonify, request, session
+
 
 load_dotenv()
 
@@ -23,7 +26,7 @@ COMPLETIONS_API_PARAMS = {
     "model": COMPLETIONS_MODEL,
 }
 def answer_query_with_context(query,df,document_embeddings,show_prompt):
-    prompt = construct_prompt(
+    prompt, arrInds = construct_prompt(
         query,
         document_embeddings,
         df
@@ -37,10 +40,9 @@ def answer_query_with_context(query,df,document_embeddings,show_prompt):
                 **COMPLETIONS_API_PARAMS
             )
 
-    return response["choices"][0]["text"].strip(" \n")
+    return response["choices"][0]["text"].strip(" \n"), arrInds
 
 def construct_prompt(question, context_embeddings, df):
-    global arrInds
     most_relevant_document_sections = order_document_sections_by_query_similarity(question, context_embeddings)
     chosen_sections = []
     chosen_sections_indexes = []
@@ -63,7 +65,7 @@ def construct_prompt(question, context_embeddings, df):
     
     header = """Answer the question as truthfully as possible using the provided context from a youtube video, and if the answer is not contained within the text below, say "This question cannot be answered with the information in the video. Please ask a different question or rephrase."\n\nContext:\n"""
     
-    return header + "".join(chosen_sections) + "\n\n Q: " + question + "\n A:"
+    return header + "".join(chosen_sections) + "\n\n Q: " + question + "\n A:", arrInds
 
 def get_embedding(text, model=EMBEDDING_MODEL):
     result = openai.Embedding.create(
@@ -108,7 +110,7 @@ def makeNumArr(arrInds):
         arr.append(int(num[i][10:len(num[i])-1]))
     return arr 
 
-def get_start_and_end(output_transcript, df):
+def get_start_and_end(output_transcript, df, arrInds):
     arrNum = makeNumArr(arrInds)
     output = output_transcript
 
@@ -128,8 +130,8 @@ def get_start_and_end(output_transcript, df):
 
     return arrTime
 
-def getLinks(df, output_transcript):
-    arrTimes = get_start_and_end(output_transcript, df)
+def getLinks(df, output_transcript, arrInds):
+    arrTimes = get_start_and_end(output_transcript, df, arrInds)
     sorted(arrTimes)
     arrLink = [] 
 
@@ -138,7 +140,7 @@ def getLinks(df, output_transcript):
     
     return arrLink
 
-def filterLinks(vid_length, df, output_transcript, is_article=False):
+def filterLinks(vid_length, df, output_transcript, arrInds, is_article=False):
     if(is_article):
         arrNum = makeNumArr(arrInds)
         text = " "
