@@ -152,7 +152,7 @@ def filterLinks(vid_length, df, output_transcript, arrInds, is_article=False):
         ratio = 0.116
         capped = min(int(ratio*vid_length/60), 10)
 
-        links = getLinks(df, output_transcript)
+        links = getLinks(df, output_transcript, arrInds)
         fin_links = []
 
         while(count <= capped):
