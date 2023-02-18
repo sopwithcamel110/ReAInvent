@@ -11,11 +11,11 @@ function QandA(args) {
             <p className={"textArea" + args.type}>
                 {args.type === "Answer" ? <img src="/logo512.png" alt="Italian Trulli" style={{
                     width: "40px", height:"40px", padding:"10px"
-                }}/> : <div/>}
+                }}/> : <></>}
                 {args.text}
                 {args.type === "Question" ? <GoPerson style= {{
                     width: "40px", height:"40px", padding:"10px"
-                }}/> : <div/>}
+                }}/> : <></>}
             </p>
             <div>
                 {

@@ -7,7 +7,7 @@ import { GrYoutube } from 'react-icons/gr';
 import { AtomLoader } from "react-loaders-kit";
 
 function App() {
-  const API_ENDPOINT = "/api";
+  const API_ENDPOINT = "";
   const urlInputRef = useRef();
   const playerRef = useRef();
   const [url, setUrl] = useState();
@@ -78,7 +78,7 @@ function App() {
         console.log("Transcript loaded.");
         setUrl("https://www.youtube.com/watch?v=" + desc)
         showChatbox(true);
-        playerRef.current.scrollIntoView({behavior: "smooth"});
+        //playerRef.scrollIntoView({behavior: "smooth"});
         setProgress("");
         showTranscriptLoader(false);
       }
@@ -111,16 +111,12 @@ function App() {
       <br/>
       <h3>{progress}</h3>
       {
-        transcriptLoader ? (<div className="progressLoader"><AtomLoader {...loaderProps}/></div>) : (<div/>)
+        transcriptLoader ? (<div className="progressLoader"><AtomLoader {...loaderProps}/></div>) : (<></>)
       }
-      {
-        chatbox ? <div>
-                    <div ref={playerRef}>
+      <div ref={playerRef}>
                       <ReactPlayer controls={true} url={url} id="videoplayer"/>
                     </div>
                     <Chatbox playerRef={playerRef} endpoint={API_ENDPOINT}/>
-                  </div> : <div/>
-      }
 		</>
 	);
 }

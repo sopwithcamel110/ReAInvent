@@ -21,6 +21,7 @@ function Chatbox(args) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ question: text })
         };
+        console.log(text);
         fetch(args.endpoint + '/ask', requestOptions)
           .then(response => response.json())
           .then(data => {
