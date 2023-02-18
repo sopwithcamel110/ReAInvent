@@ -19,6 +19,7 @@ from dotenv import load_dotenv
 from json import dumps, loads
 import helper
 from ast import literal_eval
+from flask_session import Session
 
 load_dotenv()
 
@@ -110,8 +111,8 @@ class AnswerQuestion(Resource):
         df = pd.DataFrame(data)
         df = df.set_index(["title", "heading"])
         document_embeddings = {literal_eval(k): v for k, v in session.get('embeddings').items()}
-        answer = helper.answer_query_with_context(question, df, document_embeddings, False)
-        stamps = helper.filterLinks(int(session.get('vid_length')), df, session.get('transcript'))
+        answer, arrInds = helper.answer_query_with_context(question, df, document_embeddings, False)
+        stamps = helper.filterLinks(int(session.get('vid_length')), df, session.get('transcript'), arrInds)
 
         return jsonify({"answer": answer, "stamps" : stamps})
 
@@ -126,4 +127,5 @@ api.add_resource(Ping, "/ping")
 if __name__ == '__main__':
     app.config['SESSION_TYPE'] = 'filesystem'
     app.secret_key = 'super secret key'
+    Session(app)
     app.run(host='localhost', port=5000, debug=True)
