@@ -111,12 +111,16 @@ function App() {
       <br/>
       <h3>{progress}</h3>
       {
-        transcriptLoader ? (<div className="progressLoader"><AtomLoader {...loaderProps}/></div>) : (<></>)
+        transcriptLoader ? (<div className="progressLoader"><AtomLoader {...loaderProps}/></div>) : (<div/>)
       }
-      <div ref={playerRef}>
-                      <ReactPlayer controls={true} url={url} id="videoplayer"/>
+      {
+        chatbox ? <div>
+                    <div>
+                      <ReactPlayer ref={playerRef} controls={true} url={url} id="videoplayer"/>
                     </div>
                     <Chatbox playerRef={playerRef} endpoint={API_ENDPOINT}/>
+                  </div> : <div/>
+      }
 		</>
 	);
 }
