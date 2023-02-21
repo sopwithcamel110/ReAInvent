@@ -7,7 +7,7 @@ import { GrYoutube } from 'react-icons/gr';
 import { AtomLoader } from "react-loaders-kit";
 
 function App() {
-  const API_ENDPOINT = "";
+  const API_ENDPOINT = "/api";
   const urlInputRef = useRef();
   const playerRef = useRef();
   const [url, setUrl] = useState();
