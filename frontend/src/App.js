@@ -80,7 +80,7 @@ function App() {
         console.log("Transcript loaded.");
         setUrl("https://www.youtube.com/watch?v=" + desc)
         showChatbox(true);
-        scroll.scrollTo(400);
+        scroll.scrollTo(420);
         setProgress("");
         showTranscriptLoader(false);
       }
