@@ -60,7 +60,10 @@ class GenerateTranscript(Resource):
         id=extract.video_id(url)
         # transcript: list of dictionaries with start, text, duration keys
         session['id'] = id
-        transcript = YouTubeTranscriptApi.get_transcript(id, languages=['en'])
+        try:
+            transcript = YouTubeTranscriptApi.get_transcript(id, languages=['en'])
+        except:
+            return jsonify({'Completed' : 404})
         fin_out = []
         count = 0 
 

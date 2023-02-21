@@ -81,11 +81,14 @@ function App() {
     .then((response) => response.json())
     .then((data) => {
       if (data.Completed === 1) {
-        console.log("Transcript loaded.");
         setUrl(link)
         showChatbox(true);
         scroll.scrollTo(420);
         setProgress("");
+        showTranscriptLoader(false);
+      }
+      else if (data.Completed === 404) {
+        setProgress("Requested video has no transcript. Please try a new video.")
         showTranscriptLoader(false);
       }
     });
