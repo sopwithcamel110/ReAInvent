@@ -5,8 +5,10 @@ import Chatbox from './Chatbox.js';
 import Header from './Header.js';
 import { GrYoutube } from 'react-icons/gr';
 import { AtomLoader } from "react-loaders-kit";
+import * as Scroll from 'react-scroll';
 
 function App() {
+  var scroll = Scroll.animateScroll;
   const API_ENDPOINT = "/api";
   const urlInputRef = useRef();
   const playerRef = useRef();
@@ -78,7 +80,7 @@ function App() {
         console.log("Transcript loaded.");
         setUrl("https://www.youtube.com/watch?v=" + desc)
         showChatbox(true);
-        //playerRef.scrollIntoView({behavior: "smooth"});
+        scroll.scrollTo(400);
         setProgress("");
         showTranscriptLoader(false);
       }
