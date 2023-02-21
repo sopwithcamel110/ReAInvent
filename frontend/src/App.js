@@ -9,7 +9,7 @@ import * as Scroll from 'react-scroll';
 
 function App() {
   var scroll = Scroll.animateScroll;
-  const API_ENDPOINT = "/api";
+  const API_ENDPOINT = "";
   const urlInputRef = useRef();
   const playerRef = useRef();
   const [url, setUrl] = useState();
@@ -22,7 +22,7 @@ function App() {
     duration: 2,
     colors: ["#FF2900", "#FF5500", "#FFE600"],
   };
-  let desc = "None";
+  let link = "None";
 
   function CheckServerStatus() {
     setProgress("Checking server status...");
@@ -59,6 +59,7 @@ function App() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ url: text })
     };
+    link = text;
     // Create get request
     fetch(API_ENDPOINT + "/validate", requestOptions)
     .then((response) => response.json())
@@ -81,7 +82,7 @@ function App() {
     .then((data) => {
       if (data.Completed === 1) {
         console.log("Transcript loaded.");
-        setUrl("https://www.youtube.com/watch?v=" + desc)
+        setUrl(link)
         showChatbox(true);
         scroll.scrollTo(420);
         setProgress("");
