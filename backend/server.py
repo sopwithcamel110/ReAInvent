@@ -133,7 +133,4 @@ api.add_resource(Ping, "/ping")
 
 # Driver
 if __name__ == '__main__':
-    app.config['SESSION_TYPE'] = 'filesystem'
-    app.secret_key = 'super secret key'
-    Session(app)
     app.run(host='localhost', port=5000, debug=True)
