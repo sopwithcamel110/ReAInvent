@@ -1,10 +1,13 @@
 import React from "react";
 import "./QandA.css";
 import { GoPerson } from 'react-icons/go';
+import * as Scroll from 'react-scroll';
 
 function QandA(args) {
     function seek(e) {
         args.playerRef.current.seekTo(e.target.id);
+        Scroll.animateScroll.scrollTo(420);
+        args.setPlaying(true);
     }
 	return (
 		<div className={args.type}>
@@ -17,11 +20,14 @@ function QandA(args) {
                     width: "40px", height:"40px", padding:"10px"
                 }}/> : <></>}
             </p>
-            <div>
+            <div className="answerDetails">
+                {
+                    args.type === "Answer" ? "References: " : <></>
+                }
                 {
                     args.stamps.map((value, i) => {
                     return (
-                        <input type="submit" id={value} value={"Ref " + (i+1)} onClick={seek}/>
+                        <input className="ref" type="submit" id={value} value={(i+1)} onClick={seek}/>
                     )
                     })
                 }

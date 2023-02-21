@@ -8,7 +8,6 @@ import { AtomLoader } from "react-loaders-kit";
 import * as Scroll from 'react-scroll';
 
 function App() {
-  var scroll = Scroll.animateScroll;
   const API_ENDPOINT = "/api";
   const urlInputRef = useRef();
   const playerRef = useRef();
@@ -16,6 +15,7 @@ function App() {
   const [progress, setProgress] = useState();
   const [transcriptLoader, showTranscriptLoader] = useState(false);
   const [chatbox, showChatbox] = useState(false);
+  const [isPlaying, setPlaying] = useState(false);
   const loaderProps = {
     loading: true,
     size: 80,
@@ -83,7 +83,7 @@ function App() {
       if (data.Completed === 1) {
         setUrl(link)
         showChatbox(true);
-        scroll.scrollTo(420);
+        Scroll.animateScroll.scrollTo(420);
         setProgress("");
         showTranscriptLoader(false);
       }
@@ -125,10 +125,10 @@ function App() {
       {
         chatbox ? <div>
                     <div>
-                      <ReactPlayer ref={playerRef} controls={true} url={url} id="videoplayer"/>
+                      <ReactPlayer ref={playerRef} controls={true} url={url} id="videoplayer" playing={isPlaying}/>
                     </div>
-                    <Chatbox playerRef={playerRef} endpoint={API_ENDPOINT}/>
-                  </div> : <div/>
+                    <Chatbox playerRef={playerRef} endpoint={API_ENDPOINT} setPlaying={setPlaying}/>
+                  </div> : <></>
       }
 		</>
 	);

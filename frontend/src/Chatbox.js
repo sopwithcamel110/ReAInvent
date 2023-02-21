@@ -21,11 +21,9 @@ function Chatbox(args) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ question: text })
         };
-        console.log(text);
         fetch(args.endpoint + '/ask', requestOptions)
           .then(response => response.json())
           .then(data => {
-            console.log(data.stamps);
             setChat(oldArray => [["Answer", data.answer, data.stamps], ...oldArray]);
           });
     }
@@ -41,7 +39,7 @@ function Chatbox(args) {
                 {
                     chat.map((value, index) => {
                     return (
-                        <QandA key={index} playerRef={args.playerRef} type={value[0]} text={value[1]} stamps={value[2]}/>
+                        <QandA key={index} playerRef={args.playerRef} setPlaying={args.setPlaying} type={value[0]} text={value[1]} stamps={value[2]}/>
                     )
                     })
                 }
