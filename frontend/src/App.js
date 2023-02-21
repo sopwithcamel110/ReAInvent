@@ -9,7 +9,7 @@ import * as Scroll from 'react-scroll';
 
 function App() {
   var scroll = Scroll.animateScroll;
-  const API_ENDPOINT = "";
+  const API_ENDPOINT = "/api";
   const urlInputRef = useRef();
   const playerRef = useRef();
   const [url, setUrl] = useState();
