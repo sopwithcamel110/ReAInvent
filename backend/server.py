@@ -25,10 +25,11 @@ load_dotenv()
 
 # Create Flask App
 app = Flask(__name__)
-app.secret_key = 'cruzhacks2023'
-app.config['SESSION_TYPE'] = 'filesystem'
 CORS(app)
 
+app.config['SESSION_TYPE'] = 'filesystem'
+app.secret_key = 'super secret key'
+Session(app)
 # Create API Object
 api = Api(app)
 
