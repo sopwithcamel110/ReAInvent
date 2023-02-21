@@ -39,9 +39,9 @@ function Chatbox(args) {
             </div>
             <div className="QandA">
                 {
-                    chat.map((value) => {
+                    chat.map((value, index) => {
                     return (
-                        <QandA playerRef={args.playerRef} type={value[0]} text={value[1]} stamps={value[2]}/>
+                        <QandA key={index} playerRef={args.playerRef} type={value[0]} text={value[1]} stamps={value[2]}/>
                     )
                     })
                 }
