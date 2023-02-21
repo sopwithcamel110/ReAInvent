@@ -70,10 +70,12 @@ class GenerateTranscript(Resource):
             else:
                 string = transcript[count]['text'] + " " + transcript[count+1]['text']+ " " + transcript[count+2]['text'] + " " + transcript[count+3]['text'] + transcript[count+4]['text'] + transcript[count+5]['text'] + transcript[count+6]['text'] + transcript[count+7]['text']
                 string = helper.remove_non_ascii(string)
+                string = string.replace("\n", " ")
                 start = transcript[count]['start']
                 fin_out.append({'text': string, 'start':start, 'end':-1})
                 count += 8
 
+        transcript = fin_out
         session['transcript'] = fin_out
 
         #making dataframe  
@@ -83,12 +85,13 @@ class GenerateTranscript(Resource):
         data = {'title': ['video' for i in range(len(transcript))], 'heading': [i+1 for i in range(len(transcript))], 'content': arr, "tokens" : [None for i in range(len(transcript))]}
         
         df = pd.DataFrame(data)
-        df = df.set_index(["title", "heading"])
+        # df = df.set_index(["title", "heading"])
         # print("___________Works______________")
-        # session['df'] = df.to_json()
+        session['df'] = df.to_json()
         # print('----------TESTING------------')
         # print(session['df'])
         # print("_____________Also__Works________")
+        df = df.set_index(["title", "heading"])
         val = helper.compute_doc_embeddings(df)
         # print("TESTING" + str(type(val)))
         document_embeddings = val
@@ -100,19 +103,24 @@ class GenerateTranscript(Resource):
 class AnswerQuestion(Resource):
     def post(self):
         transcript = session.get('transcript')
-        #making dataframe  
-        arr = [] 
-        for seg in transcript: 
-            arr.append(seg['text'])
-        data = {'title': ['video' for i in range(len(transcript))], 'heading': [i+1 for i in range(len(transcript))], 'content': arr, "tokens" : [None for i in range(len(transcript))]}
-        
+        # #making dataframe  
+        # arr = [] 
+        # for seg in transcript: 
+        #     arr.append(seg['text'])
+        # data = {'title': ['video' for i in range(len(transcript))], 'heading': [i+1 for i in range(len(transcript))], 'content': arr, "tokens" : [None for i in range(len(transcript))]}
+
+        df = pd.read_json(session.get('df'))
+
         content = request.json
         question = content['question']
-        df = pd.DataFrame(data)
+        # df = pd.DataFrame(data)
         df = df.set_index(["title", "heading"])
         document_embeddings = {literal_eval(k): v for k, v in session.get('embeddings').items()}
+
         answer, arrInds = helper.answer_query_with_context(question, df, document_embeddings, False)
-        stamps = helper.filterLinks(int(session.get('vid_length')), df, session.get('transcript'), arrInds)
+        # print("------------arrInds:-----------")
+        # print(arrInds)
+        stamps = helper.filterLinks(int(session.get('vid_length')), df, transcript, arrInds)
 
         return jsonify({"answer": answer, "stamps" : stamps})
 
