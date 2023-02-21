@@ -35,9 +35,10 @@ api = Api(app)
 # Create resources
 
 class ValidateURL(Resource):
-    def get(self, desc=""):
+    def post(self):
         session.clear()
-        url = "https://www.youtube.com/watch?v=" + desc
+        content = request.json
+        url = content['url']
         try:
             _ = YouTube(url)
             valid = 1
@@ -126,7 +127,7 @@ class AnswerQuestion(Resource):
 
 
 # Add resources to API
-api.add_resource(ValidateURL, "/validate/<desc>")
+api.add_resource(ValidateURL, "/validate")
 api.add_resource(GenerateTranscript, "/gentranscript")
 api.add_resource(AnswerQuestion, "/ask")
 api.add_resource(Ping, "/ping")

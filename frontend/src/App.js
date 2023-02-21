@@ -54,10 +54,13 @@ function App() {
     if (text === "") {
       text = "None"
     }
-    // Isolate descriptor from youtube link
-    desc = (text.replace("https://", "")).replace("www.youtube.com/watch?v=", "");
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: text })
+    };
     // Create get request
-    fetch(API_ENDPOINT + "/validate/" + desc)
+    fetch(API_ENDPOINT + "/validate", requestOptions)
     .then((response) => response.json())
     .then((data) => {
       if (data.Valid === 1) {
