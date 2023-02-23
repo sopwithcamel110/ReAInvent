@@ -6,7 +6,7 @@ Hosted live at https://reainvent.com/
   <img src="https://media.giphy.com/media/oepOUjo00amPeTO6ye/giphy.gif" width=600 height=350 alt="animated" />
 </p>
 
-## Project description 
+## Project description: 
 
 This was our submission for CruzHacks 2023, soon to become a full-fledged project (maybe). We created a **question answer chatbot for youtube videos** using semantic search, large language models, and REST API.
  
