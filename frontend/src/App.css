@@ -35,6 +35,8 @@ h1 {
 }
 
 #urlTextInput {
+    background: transparent;
+    margin-left:15px;
     height: 35px;
     width: 430px;
     border:0;

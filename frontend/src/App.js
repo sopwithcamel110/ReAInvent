@@ -98,6 +98,12 @@ function App() {
     CheckServerStatus();
   }
 
+  function checkURLKeyDown(e) {
+    if (e.key === 'Enter') {
+      HandleAnalyzeClicked();
+    }
+  }
+
 	return (
 		<>
       <Header/>
@@ -111,9 +117,9 @@ function App() {
       </h3>
       <div className="urlInput">
         <GrYoutube color = "red" size = "30px" style = {{
-          marginLeft: "-20px", marginBottom: "-7px"
+          marginBottom: "-7px"
         }}/>
-        <input id="urlTextInput" name="linkInput" type="text" ref={urlInputRef}/>
+        <input id="urlTextInput" name="linkInput" type="text" ref={urlInputRef} onKeyDown={checkURLKeyDown}/>
       </div>
       <br/>
       <input type="submit" id="analyzeBtn" value="Analyze" onClick={HandleAnalyzeClicked}/>

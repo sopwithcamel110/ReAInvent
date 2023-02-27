@@ -6,6 +6,9 @@ import "./Chatbox.css";
 function Chatbox(args) {
     const questionRef = useRef();
     const [chat, setChat] = useState([]);
+    function setQuestion(e) {
+        questionRef.current.value = e.currentTarget.id;
+    }
     function handleQuestionEnter(e) {
         if (e.key === 'Enter') {
           askQuestion();
@@ -37,11 +40,32 @@ function Chatbox(args) {
             </div>
             <div className="QandA">
                 {
+                    chat.length > 0 ? 
                     chat.map((value, index) => {
                     return (
                         <QandA key={index} playerRef={args.playerRef} setPlaying={args.setPlaying} type={value[0]} text={value[1]} stamps={value[2]}/>
                     )
-                    })
+                    }) : 
+                    <div className="Examples">
+                        <div className="ExampleBox" id="What are the main points of the video? "onClick={setQuestion}>
+                            <p className="ExampleText">
+                                "What are the main points of the video?" 
+                                →
+                            </p>
+                        </div>
+                        <div className="ExampleBox" id="Please summarize the video for me." onClick={setQuestion}>
+                            <p className="ExampleText">
+                                "Please summarize the video for me." 
+                                →
+                            </p>
+                        </div>
+                        <div className="ExampleBox" id="Where does the video take place?" onClick={setQuestion}>
+                            <p className="ExampleText">
+                                "Where does the video take place?" 
+                                →
+                            </p>
+                        </div>
+                    </div>
                 }
             </div>
       </div>
