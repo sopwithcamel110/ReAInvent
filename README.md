@@ -1,4 +1,4 @@
-# CruzHacks2023
+# ReAInvent
 Hosted live at https://reainvent.com/
 ## Example:
 
@@ -6,7 +6,7 @@ Hosted live at https://reainvent.com/
   <img src="https://media.giphy.com/media/oepOUjo00amPeTO6ye/giphy.gif" width=600 height=350 alt="animated" />
 </p>
 
-## Project description 
+## Project description: 
 
 This was our submission for CruzHacks 2023, soon to become a full-fledged project (maybe). We created a **question answer chatbot for youtube videos** using semantic search, large language models, and REST API.
  
@@ -42,7 +42,7 @@ pip install -r requirements.txt
 ```console 
 python3 ./backend/server.py
 ```
-_Note: You need to provide an OpenAI API key in a .env file within the backend directory. We are currently working on deploying this project but for now, running locally will require an API key. The .env file should have the text `openai_key = "{API_KEY}"`._
+_Note: You need to provide an OpenAI API key in a .env file within the backend directory. OpenAI APIs are not free to use, and will require you to provide payment info to generate tokens past the free trial. The .env file should have the line `openai_key = "{API_KEY}"`._
 ## Start the Website
 When running in development mode, make sure to set this line at the top of App.js so the site can communicate with the API. By default, it is set to "/api"
 ```console
