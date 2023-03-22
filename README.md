@@ -1,4 +1,3 @@
-# ReAInvent
 Hosted live at https://reainvent.com/
 ## Example:
 
@@ -22,7 +21,7 @@ We use `pytube` and `youtube_transcript_api` to scrape a given youtube url for i
 
 We also use prompt engineering to prevent hallucinations (misinfomration) by GPT, and include relevant timestamps so you can quickly watch back the sections you are looking for.
 
-# How to run
+# Running in Development Mode
 
 ## Create a virtual environment
 1. Start by navigating to the project directory
@@ -44,7 +43,7 @@ python3 ./backend/server.py
 ```
 _Note: You need to provide an OpenAI API key in a .env file within the backend directory. OpenAI APIs are not free to use, and will require you to provide payment info to generate tokens past the free trial. The .env file should have the line `openai_key = "{API_KEY}"`._
 ## Start the Website
-When running in development mode, make sure to set this line at the top of App.js so the site can communicate with the API. By default, it is set to "/api"
+*When running in development mode, make sure to set this line at the top of App.js so the site can communicate with the API. By default, it is set to "/api"*
 ```console
 const API_ENDPOINT = "";
 ```
