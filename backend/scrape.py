@@ -28,10 +28,23 @@ def remove_non_ascii(string):
 
 # link for extract html data
 def getdata(url):
-	r = requests.get(url)
-	return r.text
+    try:
+	    r = requests.get(url)
+    except:
+        print("invalid link")
+        return None
+    return r.text
 
-htmldata = getdata("https://www.reuters.com/world/middle-east/two-women-survive-days-earthquake-rubble-death-toll-tops-24150-2023-02-11/")
+t = YouTube("https://www.youtube.com/watch?v=zzyai3wAkpo")
+try:
+    t.check_availability()
+    print("should print")
+except:
+    print("worked")
+
+
+
+htmldata = getdata("https://www.newschannel5.com/news/police-responding-to-active-aggressor-situation-at-covenant-school")
 soup = BeautifulSoup(htmldata, 'html.parser')
 data = ''
 temp = [] 
@@ -68,8 +81,12 @@ with open('./content/output_article.csv', 'w', newline='') as file:
         count += 1
         writer.writerow(["article", str(count), seg])
 
-df = pd.read_csv('./content/output_article.csv')
+#TODO: Delete the lines above and make this work with directly writing to a dataframe 
+data = {'title': ["article" for i in range(len(list_strings))], 'heading': [str(count) for count in range(len(list_strings))], 'content': [seg for seg in list_strings], 'tokens': [None for i in range(len(list_strings))]}
+
+df = pd.DataFrame(data)
 df = df.set_index(["title", "heading"])
+print(df)
 document_embeddings = helper.compute_doc_embeddings(df)
 question = ""
 while(True):
@@ -77,9 +94,9 @@ while(True):
     if(question == 'q'):
         break
     print("__________________RESPONSE_____________________")
-    answer = helper.answer_query_with_context(question, df, document_embeddings, False)
+    answer, arrInds = helper.answer_query_with_context(question, df, document_embeddings, False)
     print(answer)
     print("__________________TIME STAMPS_________________")
-    print(helper.filterLinks(0, df, None, is_article=True))
+    print(helper.filterLinks(0, df, None, arrInds, is_article=True))
 
 
