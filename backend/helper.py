@@ -47,13 +47,14 @@ def construct_prompt(question, context_embeddings, df):
     chosen_sections = []
     chosen_sections_indexes = []
 
-    count = 30
+    count = min(30, df.shape[0]) #if the number of rows is less than 30, then it will scan the entire document
     
     for _, section_index in most_relevant_document_sections:
         # Add contexts until we run out of space.  
         # print(section_index)      
         # print("DATAFRAME: ")
         # print(df.head(94))
+        print(section_index)
         document_section = df.loc[section_index]
         
         if count == 0:
