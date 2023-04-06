@@ -8,7 +8,7 @@ import { AtomLoader } from "react-loaders-kit";
 import * as Scroll from 'react-scroll';
 
 function App() {
-  const API_ENDPOINT = "/api";
+  const API_ENDPOINT = "";
   const urlInputRef = useRef();
   const playerRef = useRef();
   const [url, setUrl] = useState();
@@ -89,6 +89,10 @@ function App() {
       }
       else if (data.Completed === 404) {
         setProgress("Requested video has no transcript. Please try a new video.")
+        showTranscriptLoader(false);
+      }
+      else if (data.Completed === 403) {
+        setProgress("Requested article has no text. Please try a new article.")
         showTranscriptLoader(false);
       }
     });
