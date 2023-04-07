@@ -8,7 +8,7 @@ import { AtomLoader } from "react-loaders-kit";
 import * as Scroll from 'react-scroll';
 
 function App() {
-  const API_ENDPOINT = "";
+  const API_ENDPOINT = "/api";
   const urlInputRef = useRef();
   const playerRef = useRef();
   const [url, setUrl] = useState();
